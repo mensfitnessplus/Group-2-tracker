@@ -8,89 +8,119 @@
 <title>CA Hours Tracker</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{background:#0F1117;color:#E8EAF0;font-family:'DM Sans','Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding-bottom:80px;min-height:100vh;}
   ::-webkit-scrollbar{display:none;}
   button{font-family:inherit;cursor:pointer;}
   button:active{opacity:.7;transform:scale(.97);}
 
-  /* Header */
-  #header{background:linear-gradient(135deg,#1A1D28,#161924);padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:50;}
-  #header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  /* ── DARK MODE (default) ── */
+  body{
+    background:#0F1117;color:#E8EAF0;
+    font-family:'DM Sans','Segoe UI',sans-serif;
+    max-width:480px;margin:0 auto;padding-bottom:80px;min-height:100vh;
+    transition:background .3s,color .3s;
+  }
+  #header{background:linear-gradient(135deg,#1A1D28,#161924);padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:50;transition:background .3s,border-color .3s;}
   #header-label{font-size:10px;letter-spacing:2px;color:#666;text-transform:uppercase;font-weight:700;}
   #header-title{font-size:19px;font-weight:800;letter-spacing:-.5px;}
-  #header-right{text-align:right;}
   #header-remaining{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;}
   #header-sub{font-size:10px;color:#888;}
   #global-bar-wrap{height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
   #global-bar{height:100%;background:linear-gradient(90deg,#7EC8A8,#E8A87C);border-radius:3px;transition:width .5s ease;}
   #header-pct{font-size:10px;color:#555;margin-top:4px;}
-
-  /* Tabs */
-  #tabs{display:flex;background:#161924;border-bottom:1px solid rgba(255,255,255,.06);padding:0 10px;overflow-x:auto;}
+  #tabs{display:flex;background:#161924;border-bottom:1px solid rgba(255,255,255,.06);padding:0 10px;overflow-x:auto;transition:background .3s;}
   .tab-btn{background:none;border:none;padding:11px 13px 9px;font-size:12px;font-weight:600;color:#555;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .2s;}
   .tab-btn.active{border-bottom-color:var(--col);}
+  .card{background:#1A1D28;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06);transition:background .3s,border-color .3s;}
+  .card.done{background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18);}
+  .bar-wrap{height:4px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:6px;}
+  .chapter-card{background:#1A1D28;border-radius:14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);overflow:hidden;transition:background .3s,border-color .3s;}
+  .chapter-card.done{background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18);}
+  .chapter-body{border-top:1px solid rgba(255,255,255,.06);padding:10px 14px 14px;display:none;}
+  .chapter-arrow{color:#444;font-size:16px;margin-left:auto;transition:transform .2s,color .3s;}
+  .ch-time{font-size:10px;color:#666;margin-top:2px;}
+  .lec-row{display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);}
+  #stats-strip{display:flex;gap:0;background:#161924;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;transition:background .3s;}
+  .stat-pill{flex:1;min-width:90px;padding:8px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.05);}
+  .stat-pill:last-child{border-right:none;}
+  .stat-val{font-size:13px;font-weight:800;letter-spacing:-.5px;color:#fff;white-space:nowrap;transition:color .3s;}
+  .stat-lbl{font-size:9px;color:#555;margin-top:1px;text-transform:uppercase;letter-spacing:.5px;}
+  .day-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+  .day-label{font-size:12px;font-weight:700;min-width:82px;color:#ccc;}
+  .day-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+  .lec-date{font-size:9px;color:#555;margin-top:1px;}
 
-  /* Pages */
+  /* ── LIGHT MODE ── */
+  body.light{background:#F0EEE9;color:#1E1B16;}
+  body.light #header{background:linear-gradient(135deg,#E8E2D9,#EDE8E0);border-bottom:1px solid rgba(0,0,0,.07);}
+  body.light #header-label{color:#A09880;}
+  body.light #header-remaining{color:#1E1B16;}
+  body.light #header-sub{color:#9A8F80;}
+  body.light #global-bar-wrap{background:rgba(0,0,0,.08);}
+  body.light #header-pct{color:#B0A898;}
+  body.light #tabs{background:#EAE5DC;border-bottom:1px solid rgba(0,0,0,.07);}
+  body.light .tab-btn{color:#B0A898;}
+  body.light #stats-strip{background:#EAE5DC;border-bottom:1px solid rgba(0,0,0,.07);}
+  body.light .stat-pill{border-right:1px solid rgba(0,0,0,.07);}
+  body.light .stat-val{color:#1E1B16;}
+  body.light .stat-lbl{color:#A09880;}
+  body.light .card{background:#F7F4EF;border:1px solid rgba(0,0,0,.07);}
+  body.light .card.done{background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2);}
+  body.light .chapter-card{background:#F7F4EF;border:1px solid rgba(0,0,0,.07);}
+  body.light .chapter-card.done{background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2);}
+  body.light .chapter-body{border-top:1px solid rgba(0,0,0,.06);}
+  body.light .chapter-arrow{color:#C0B8AA;}
+  body.light .bar-wrap{background:rgba(0,0,0,.07);}
+  body.light .lec-row{border-bottom:1px solid rgba(0,0,0,.05);}
+  body.light .day-row{border-bottom:1px solid rgba(0,0,0,.05);}
+  body.light .day-label{color:#4A3F30;}
+  body.light .day-bar-wrap{background:rgba(0,0,0,.07);}
+  body.light .lec-date{color:#B0A898;}
+  body.light .ch-time{color:#A09880;}
+
+  /* ── SHARED STATIC STYLES ── */
+  #header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  #header-right{text-align:right;}
   .page{padding:16px;display:none;}
   .page.visible{display:block;}
-
-  /* Cards */
-  .card{background:#1A1D28;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06);}
-  .card.done{background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18);}
   .card-row{display:flex;align-items:center;gap:12px;}
-
-  /* Mini bar */
-  .bar-wrap{height:4px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:6px;}
   .bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
-
-  /* SVG ring */
   .ring-wrap{position:relative;flex-shrink:0;}
   .ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:inherit;}
-
-  /* Chapter expand */
-  .chapter-card{background:#1A1D28;border-radius:14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);overflow:hidden;}
-  .chapter-card.done{background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18);}
   .chapter-header{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;}
-  .chapter-body{border-top:1px solid rgba(255,255,255,.06);padding:10px 14px 14px;display:none;}
   .chapter-body.open{display:block;}
-  .chapter-arrow{color:#444;font-size:16px;margin-left:auto;transition:transform .2s;}
   .chapter-arrow.open{transform:rotate(90deg);}
-
   .ch-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;display:inline-block;margin-bottom:3px;}
   .ch-name{font-size:12px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ch-time{font-size:10px;color:#666;margin-top:2px;}
-
-  /* Lecture row */
-  .lec-row{display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);}
   .lec-row:last-child{border-bottom:none;}
   .lec-check{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s;}
   .lec-name{flex:1;font-size:12px;}
   .lec-dur{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;}
-
   .btn-row{display:flex;justify-content:space-between;margin-bottom:10px;}
   .btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:none;}
-
-  /* Stats strip */
-  #stats-strip{display:flex;gap:0;background:#161924;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;}
-  .stat-pill{flex:1;min-width:90px;padding:8px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.05);}
-  .stat-pill:last-child{border-right:none;}
-  .stat-val{font-size:13px;font-weight:800;letter-spacing:-.5px;color:#fff;white-space:nowrap;}
-  .stat-lbl{font-size:9px;color:#555;margin-top:1px;text-transform:uppercase;letter-spacing:.5px;}
-
-  /* Countdown timer */
   #countdown-wrap{font-variant-numeric:tabular-nums;}
-
-  /* Daily tracker */
   #daily-panel{padding:16px;}
-  .day-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
   .day-row:last-child{border-bottom:none;}
-  .day-label{font-size:12px;font-weight:700;min-width:82px;color:#ccc;}
-  .day-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
   .day-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#7EC8A8,#7EB8C8);transition:width .4s ease;}
   .day-hrs{font-size:11px;font-weight:700;color:#7EC8A8;min-width:36px;text-align:right;}
 
-  /* Lec date badge */
-  .lec-date{font-size:9px;color:#555;margin-top:1px;}
+  /* ── THEME TOGGLE BUTTON ── */
+  #theme-toggle{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:20px;
+    padding:4px 10px;
+    font-size:12px;
+    color:#aaa;
+    display:flex;align-items:center;gap:5px;
+    transition:all .25s;
+    white-space:nowrap;
+    margin-top:2px;
+  }
+  body.light #theme-toggle{
+    background:rgba(0,0,0,.07);
+    border-color:rgba(0,0,0,.12);
+    color:#7A6F60;
+  }
 </style>
 </head>
 <body>
@@ -104,6 +134,7 @@
     <div id="header-right">
       <div id="header-remaining">—</div>
       <div id="header-sub">remaining</div>
+      <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
     </div>
   </div>
   <div id="global-bar-wrap"><div id="global-bar" style="width:0%"></div></div>
@@ -719,8 +750,27 @@ function handleSwipe() {
   }
 }
 
+// --- Theme toggle ---
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  const btn = document.getElementById('theme-toggle');
+  btn.textContent = isLight ? '🌙 Dark' : '☀️ Light';
+  try { localStorage.setItem('ca_theme', isLight ? 'light' : 'dark'); } catch{}
+}
+function initTheme() {
+  try {
+    const saved = localStorage.getItem('ca_theme');
+    if(saved === 'light') {
+      document.body.classList.add('light');
+      const btn = document.getElementById('theme-toggle');
+      if(btn) btn.textContent = '🌙 Dark';
+    }
+  } catch{}
+}
+
 // --- Boot ---
 initState();
+initTheme();
 render();
 </script>
 </body>
