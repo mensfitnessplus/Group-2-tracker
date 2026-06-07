@@ -76,6 +76,10 @@
   body.light .day-bar-wrap{background:rgba(0,0,0,.07);}
   body.light .lec-date{color:#B0A898;}
   body.light .ch-time{color:#A09880;}
+  body.light .chapter-card.starred{background:#FFFBEB;border-color:rgba(245,200,66,.3);}
+  body.light .chapter-card.starred .ch-name{color:#5A4800;}
+
+  .chapter-card.starred{border-color:rgba(245,200,66,.3);background:rgba(255,210,50,.03);}
 
   /* ── SHARED STATIC STYLES ── */
   #header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
@@ -379,19 +383,23 @@ const SUBJECTS = [
 
 const STORAGE_KEY = "hours_tracker_html_v1";
 const TIMESTAMPS_KEY = "hours_tracker_timestamps_v1";
+const STARRED_KEY = "hours_tracker_starred_v1";
 
 // --- State ---
 let watched = {};
 let timestamps = {}; // lecId -> ISO date string when ticked
+let starred = {};    // chapterId -> true
 
 function initState() {
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(l => { watched[l.id] = l.done; })));
   try { const s = localStorage.getItem(STORAGE_KEY); if(s) watched = JSON.parse(s); } catch{}
   try { const t = localStorage.getItem(TIMESTAMPS_KEY); if(t) timestamps = JSON.parse(t); } catch{}
+  try { const r = localStorage.getItem(STARRED_KEY); if(r) starred = JSON.parse(r); } catch{}
 }
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(watched)); } catch{}
   try { localStorage.setItem(TIMESTAMPS_KEY, JSON.stringify(timestamps)); } catch{}
+  try { localStorage.setItem(STARRED_KEY, JSON.stringify(starred)); } catch{}
 }
 
 // --- Utils ---
@@ -553,7 +561,31 @@ function renderTabs() {
 // --- Render overview ---
 function renderOverview() {
   const g = globalStats();
-  let html = `<div class="card" style="border-radius:18px;padding:18px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
+
+  // Build starred list
+  const starredList = [];
+  SUBJECTS.forEach(sub => sub.chapters.forEach(ch => {
+    if(starred[ch.id]) starredList.push({sub, ch});
+  }));
+  let starredCard = '';
+  if(starredList.length > 0) {
+    const rows = starredList.map(({sub,ch}) =>
+      `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,210,50,.08);cursor:pointer" onclick="switchTab('${sub.id}')">
+        <span style="font-size:13px">⭐</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ch.name}</div>
+          <div style="font-size:10px;color:#888">${sub.short}</div>
+        </div>
+        <button onclick="(function(e){e.stopPropagation();starred['${ch.id}']=false;delete starred['${ch.id}'];save();render();})(event)" style="background:rgba(255,210,50,.12);border:1px solid rgba(255,210,50,.3);color:#F5C842;font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;cursor:pointer">✕ Clear</button>
+      </div>`
+    ).join('');
+    starredCard = `<div class="card" style="border-radius:14px;padding:14px 16px;margin-bottom:14px;border-color:rgba(255,210,50,.2);background:rgba(255,210,50,.04)">
+      <div style="font-size:11px;font-weight:700;color:#F5C842;letter-spacing:.5px;margin-bottom:6px">⭐ CHECK NEW RESOURCES</div>
+      ${rows}
+    </div>`;
+  }
+
+  let html = starredCard + `<div class="card" style="border-radius:18px;padding:18px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
     <div class="card-row">
       ${makeSVGRing(g.pct,72,7,'#7EC8A8',12)}
       <div>
@@ -592,15 +624,42 @@ function renderSubject(sub) {
     </div>
   </div>`;
 
+  // compute difficulty dots: rank chapters by total mins within this subject
+  const chTotals = sub.chapters.map(c => c.lectures.reduce((s,l)=>s+l.mins,0));
+  const minTotal = Math.min(...chTotals);
+  const maxTotal = Math.max(...chTotals);
+
   sub.chapters.forEach((ch, idx) => {
     const cs = chStats(ch);
     const isOpen = expandedChapter === ch.id;
-    html += `<div class="chapter-card${cs.allDone?' done':''}" id="chcard_${ch.id}">
+    const lecCount = ch.lectures.length;
+
+    // difficulty: 1–5 dots based on total duration relative to subject min/max
+    const chTotal = chTotals[idx];
+    let dots;
+    if(maxTotal === minTotal) {
+      dots = 3;
+    } else {
+      dots = Math.round(1 + ((chTotal - minTotal) / (maxTotal - minTotal)) * 4);
+    }
+    const dotColor = cs.allDone ? '#7EC8A8' : sub.color;
+    const dotHTML = Array.from({length:5},(_,i) =>
+      `<span style="font-size:8px;color:${i < dots ? dotColor : 'rgba(128,128,128,.25)'}">●</span>`
+    ).join('');
+
+    const isStarred = !!starred[ch.id];
+
+    html += `<div class="chapter-card${cs.allDone?' done':''}${isStarred?' starred':''}" id="chcard_${ch.id}">
       <div class="chapter-header" onclick="toggleChapter('${ch.id}')">
         ${makeSVGRing(cs.pct,40,4,cs.allDone?'#7EC8A8':sub.color,9)}
         <div style="flex:1;min-width:0">
-          <span class="ch-tag" style="color:${sub.accent};background:${sub.color}22">Ch ${idx+1}</span>
-          ${cs.allDone?'<span style="font-size:12px">✓</span>':''}
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span class="ch-tag" style="color:${sub.accent};background:${sub.color}22">Ch ${idx+1}</span>
+            ${cs.allDone?'<span style="font-size:12px">✓</span>':''}
+            ${isStarred?'<span style="font-size:12px;line-height:1" title="New resources available">⭐</span>':''}
+            <span style="font-size:9px;color:#666;font-weight:600;margin-left:2px">${lecCount} lec${lecCount!==1?'s':''}</span>
+            <span style="margin-left:2px;letter-spacing:1px">${dotHTML}</span>
+          </div>
           <div class="ch-name">${ch.name}</div>
           <div class="ch-time">${cs.allDone
             ? `<span style="color:#7EC8A8">Complete · ${fmtMins(cs.total)}</span>`
@@ -615,6 +674,9 @@ function renderSubject(sub) {
             onclick="markAll('${sub.id}','${ch.id}',true)">✓ All done</button>
           <button class="btn-sm" style="background:rgba(255,255,255,.04);color:#666;border:1px solid rgba(255,255,255,.1)"
             onclick="markAll('${sub.id}','${ch.id}',false)">✗ Reset</button>
+          <button class="btn-sm" onclick="toggleStar('${sub.id}','${ch.id}',event)" style="background:${isStarred?'rgba(255,210,50,.15)':'rgba(255,255,255,.04)'};color:${isStarred?'#F5C842':'#666'};border:1px solid ${isStarred?'rgba(255,210,50,.35)':'rgba(255,255,255,.1)'}">
+            ${isStarred?'★ Starred':'☆ Star'}
+          </button>
         </div>
         ${ch.lectures.map((lec,li) => {
           const isDone = !!watched[lec.id];
@@ -699,6 +761,16 @@ window.toggleLec = function(subId, chId, lecId) {
   const pages = document.getElementById('pages');
   pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
   renderHeader();
+};
+
+window.toggleStar = function(subId, chId, e) {
+  e.stopPropagation();
+  starred[chId] = !starred[chId];
+  if(!starred[chId]) delete starred[chId];
+  save();
+  const sub = SUBJECTS.find(s=>s.id===subId);
+  const pages = document.getElementById('pages');
+  pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
 };
 
 window.markAll = function(subId, chId, val) {
