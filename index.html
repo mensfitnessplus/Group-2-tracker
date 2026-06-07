@@ -123,6 +123,10 @@
     <div class="stat-val" id="stat-countdown" style="font-size:11px;color:#E8A87C;">—</div>
     <div class="stat-lbl">To next day ↓</div>
   </div>
+  <div class="stat-pill" style="min-width:110px">
+    <div class="stat-val" id="stat-completion" style="font-size:11px;color:#7EC8A8;">—</div>
+    <div class="stat-lbl">Done by 🎯</div>
+  </div>
 </div>
 
 <div id="tabs"></div>
@@ -489,6 +493,20 @@ function renderHeader() {
   // Feature 3: countdown to next day drop
   const mins = timeToNextDayDrop(g.remaining);
   document.getElementById('stat-countdown').textContent = fmtCountdown(mins) + ' to go';
+
+  // Feature 5: syllabus completion date
+  const compEl = document.getElementById('stat-completion');
+  if(days <= 0) {
+    compEl.textContent = '🎉 Done!';
+  } else {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const completionDate = new Date(today);
+    completionDate.setDate(today.getDate() + days);
+    const opts = {day:'numeric',month:'short'};
+    const dateStr = completionDate.toLocaleDateString('en-IN', opts);
+    compEl.textContent = dateStr;
+  }
 }
 
 // --- Render tabs ---
