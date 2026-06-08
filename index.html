@@ -491,6 +491,15 @@ function chapterStats() {
   return {total, done};
 }
 
+function lectureStats() {
+  let total=0, done=0;
+  SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
+    total++;
+    if(watched[lec.id]) done++;
+  })));
+  return {total, done, pct: total ? Math.round(done/total*100) : 0};
+}
+
 // --- Feature 2 & 3: Days left + countdown ---
 const HOURS_PER_DAY = 6;
 function daysLeft(remainingMins) {
@@ -606,7 +615,7 @@ function renderHeader() {
 // --- Render tabs ---
 function renderTabs() {
   const tabsEl = document.getElementById('tabs');
-  const tabs = [{id:'overview',label:'Overview',color:'#888'}, ...SUBJECTS.map(s=>({id:s.id,label:s.short,color:s.color})), {id:'daily',label:'📅 Daily',color:'#7EC8A8'}];
+  const tabs = [{id:'daily',label:'📅 Daily',color:'#7EC8A8'}, {id:'overview',label:'Overview',color:'#888'}, ...SUBJECTS.map(s=>({id:s.id,label:s.short,color:s.color}))];
   tabsEl.innerHTML = tabs.map(t => {
     const isActive = currentTab==='overview' ? t.id==='overview' : t.id===currentTab;
     return `<button class="tab-btn${isActive?' active':''}" style="--col:${t.color};${isActive?'color:'+t.color:''}" onclick="switchTab('${t.id}')">${t.label}</button>`;
@@ -664,6 +673,20 @@ function renderOverview() {
       <div style="color:#444;font-size:18px;margin-left:8px">›</div>
     </div>`;
   });
+  const lv = lectureStats();
+  const videoCard = `<div class="card" style="border-radius:14px;padding:14px 16px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.5px;text-transform:uppercase">Videos Watched</div>
+      <div style="font-size:11px;font-weight:800;color:#7EC8A8">${lv.pct}%</div>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
+      <div style="font-size:22px;font-weight:800;color:#fff">${lv.done}</div>
+      <div style="font-size:13px;color:#555">/ ${lv.total} lectures</div>
+      <div style="font-size:11px;color:#666;margin-left:auto">${lv.total - lv.done} remaining</div>
+    </div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:${lv.pct}%;background:linear-gradient(90deg,#7EC8A8,#7EB8C8)"></div></div>
+  </div>`;
+  html += videoCard;
   html += starredCard;
   return html;
 }
@@ -861,7 +884,7 @@ function handleSwipe() {
   const distance = touchendX - touchstartX;
   
   // Rebuild the exact order of your tabs
-  const tabOrder = ['overview', ...SUBJECTS.map(s => s.id), 'daily'];
+  const tabOrder = ['daily', 'overview', ...SUBJECTS.map(s => s.id)];
   const currentIndex = tabOrder.indexOf(currentTab);
 
   // Swiped Left (Finger moved left) -> Next Tab
