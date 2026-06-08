@@ -2,227 +2,466 @@
 <html lang="en">
 <head>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0F1117">
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CA Hours Tracker</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  ::-webkit-scrollbar{display:none;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:4px;}
   button{font-family:inherit;cursor:pointer;}
-  button:active{opacity:.7;transform:scale(.97);}
+  button:active{opacity:.75;transform:scale(.97);}
 
-  /* ── DARK MODE (default) ── */
-  body{
-    background:#0F1117;color:#E8EAF0;
+  /* ── LAYOUT ROOT ── */
+  html, body {
+    height:100%;overflow:hidden;
     font-family:'DM Sans','Segoe UI',sans-serif;
-    max-width:480px;margin:0 auto;padding-bottom:80px;min-height:100vh;
+    background:#0B0D14;color:#E8EAF0;
     transition:background .3s,color .3s;
   }
-  #header{background:linear-gradient(135deg,#1A1D28,#161924);padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:50;transition:background .3s,border-color .3s;}
-  #header-label{font-size:10px;letter-spacing:2px;color:#666;text-transform:uppercase;font-weight:700;}
-  #header-title{font-size:19px;font-weight:800;letter-spacing:-.5px;}
-  #header-remaining{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;}
-  #header-sub{font-size:10px;color:#888;}
-  #global-bar-wrap{height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
-  #global-bar{height:100%;background:linear-gradient(90deg,#7EC8A8,#E8A87C);border-radius:3px;transition:width .5s ease;}
-  #header-pct{font-size:10px;color:#555;margin-top:4px;}
-  #tabs{display:flex;background:#161924;border-bottom:1px solid rgba(255,255,255,.06);padding:0 10px;overflow-x:auto;transition:background .3s;}
-  .tab-btn{background:none;border:none;padding:11px 13px 9px;font-size:12px;font-weight:600;color:#555;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .2s;}
-  .tab-btn.active{border-bottom-color:var(--col);}
-  .card{background:#1A1D28;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06);transition:background .3s,border-color .3s;}
-  .card.done{background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18);}
-  .bar-wrap{height:4px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:6px;}
-  .chapter-card{background:#1A1D28;border-radius:14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);overflow:hidden;transition:background .3s,border-color .3s;}
-  .chapter-card.done{background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18);}
-  .chapter-body{border-top:1px solid rgba(255,255,255,.06);padding:10px 14px 14px;display:none;}
-  .chapter-arrow{color:#444;font-size:16px;margin-left:auto;transition:transform .2s,color .3s;}
-  .ch-time{font-size:10px;color:#666;margin-top:2px;}
-  .lec-row{display:flex;align-items:center;gap:10px;padding:9px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);}
-  #stats-strip{display:flex;gap:0;background:#161924;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;transition:background .3s;}
-  .stat-pill{flex:1;min-width:90px;padding:8px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.05);}
-  .stat-pill:last-child{border-right:none;}
-  .stat-val{font-size:13px;font-weight:800;letter-spacing:-.5px;color:#fff;white-space:nowrap;transition:color .3s;}
-  .stat-lbl{font-size:9px;color:#555;margin-top:1px;text-transform:uppercase;letter-spacing:.5px;}
-  .day-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-  .day-label{font-size:12px;font-weight:700;min-width:82px;color:#ccc;}
-  .day-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
-  .lec-date{font-size:9px;color:#555;margin-top:1px;}
+
+  #app {
+    display:flex; /* Changed to flex to allow resizer */
+    height:100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-width, 280px);
+    min-width: 220px;
+    max-width: 600px;
+    background:linear-gradient(180deg,#141720 0%,#0F1117 100%);
+    border-right:1px solid rgba(255,255,255,.07);
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    position:relative;
+    flex-shrink: 0;
+  }
+
+  /* ── RESIZER ── */
+  #resizer {
+    width: 6px;
+    background: rgba(255,255,255,.02);
+    cursor: col-resize;
+    flex-shrink: 0;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+  #resizer:hover, #resizer:active {
+    background: #7EC8A8;
+  }
+  body.light #resizer {
+    background: rgba(0,0,0,.03);
+  }
+  body.light #resizer:hover, body.light #resizer:active {
+    background: #3A8BA8;
+  }
+
+  /* Sidebar top brand area */
+  #sidebar-brand {
+    padding:24px 22px 18px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    flex-shrink:0;
+  }
+  #brand-label {
+    font-size:10px;letter-spacing:2.5px;color:#555;text-transform:uppercase;font-weight:700;margin-bottom:4px;
+  }
+  #brand-title {
+    font-size:18px;font-weight:800;letter-spacing:-.4px;color:#fff;
+  }
+  #brand-sub { font-size:11px;color:#555;margin-top:2px; }
+
+  /* Global progress ring + remaining */
+  #sidebar-hero {
+    padding:20px 22px 16px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    display:flex;align-items:center;gap:16px;
+    flex-shrink:0;
+  }
+  #hero-remaining { font-size:24px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1; }
+  #hero-sub { font-size:11px;color:#666;margin-top:2px; }
+  #hero-pct { font-size:11px;color:#555;margin-top:4px; }
+
+  /* Global bar under hero */
+  #global-bar-wrap {
+    height:3px;background:rgba(255,255,255,.07);margin:0 22px;border-radius:2px;flex-shrink:0;
+  }
+  #global-bar {
+    height:100%;background:linear-gradient(90deg,#7EC8A8,#E8A87C);border-radius:2px;transition:width .5s ease;
+  }
+
+  /* Stats grid */
+  #sidebar-stats {
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:1px;background:rgba(255,255,255,.05);
+    border-top:1px solid rgba(255,255,255,.05);
+    border-bottom:1px solid rgba(255,255,255,.05);
+    flex-shrink:0;
+  }
+  .stat-cell {
+    padding:12px 16px;background:#0F1117;
+  }
+  .stat-val { font-size:14px;font-weight:800;letter-spacing:-.5px;color:#fff;white-space:nowrap; }
+  .stat-lbl { font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-top:2px; }
+
+  /* Sidebar nav */
+  #sidebar-nav {
+    flex:1;overflow-y:auto;padding:12px 12px;
+  }
+  .nav-section-label {
+    font-size:10px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;
+    padding:6px 12px 4px;
+  }
+  .nav-btn {
+    display:flex;align-items:center;gap:12px;
+    width:100%;background:none;border:none;
+    padding:10px 12px;border-radius:10px;
+    font-size:13px;font-weight:600;color:#666;
+    text-align:left;transition:all .15s;
+    white-space:nowrap;overflow:hidden;
+    margin-bottom:3px;
+  }
+  .nav-btn:hover { background:rgba(255,255,255,.05);color:#aaa; }
+  .nav-btn.active { background:rgba(255,255,255,.07);color:#fff; }
+  .nav-btn .nav-dot {
+    width:8px;height:8px;border-radius:50%;flex-shrink:0;
+    background:currentColor;opacity:.4;
+    transition:opacity .15s;
+  }
+  .nav-btn.active .nav-dot { opacity:1; }
+  .nav-btn .nav-pct {
+    margin-left:auto;font-size:11px;font-weight:700;opacity:.5;flex-shrink:0;
+  }
+  .nav-btn.active .nav-pct { opacity:1; }
+
+  /* Sidebar footer */
+  #sidebar-footer {
+    padding:14px 16px;border-top:1px solid rgba(255,255,255,.06);
+    display:flex;gap:10px;flex-shrink:0;
+  }
+  #theme-toggle,#settings-btn {
+    flex:1;background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;padding:8px 12px;
+    font-size:12px;font-weight:600;color:#888;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:all .2s;
+  }
+  #theme-toggle:hover,#settings-btn:hover {
+    background:rgba(255,255,255,.1);color:#ccc;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    flex:1;
+    min-width:0;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* Top bar */
+  #topbar {
+    background:#0D0F17;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    padding:16px 26px;
+    display:flex;align-items:center;justify-content:space-between;
+    flex-shrink:0;
+  }
+  #topbar-title {
+    font-size:17px;font-weight:800;letter-spacing:-.3px;
+  }
+  #topbar-sub { font-size:12px;color:#555;margin-top:2px; }
+
+  /* Content scroll area */
+  #content {
+    flex:1;overflow-y:auto;padding:26px;
+  }
+
+  /* Cards */
+  .card {
+    background:#141720;border-radius:14px;padding:18px 20px;
+    margin-bottom:14px;border:1px solid rgba(255,255,255,.06);
+    transition:background .3s,border-color .3s;
+  }
+  .card.done { background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18); }
+
+  /* Overview grid */
+  #overview-grid {
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    margin-bottom:14px;
+  }
+  .overview-subject-card {
+    background:#141720;border-radius:14px;padding:16px 18px;
+    border:1px solid rgba(255,255,255,.06);cursor:pointer;
+    display:flex;align-items:center;gap:14px;
+    transition:background .15s,border-color .15s,transform .1s;
+  }
+  .overview-subject-card:hover {
+    background:#1A1D28;border-color:rgba(255,255,255,.1);
+    transform:translateY(-1px);
+  }
+
+  /* Chapter cards */
+  .chapter-card {
+    background:#141720;border-radius:14px;margin-bottom:10px;
+    border:1px solid rgba(255,255,255,.06);overflow:hidden;
+    transition:background .2s,border-color .2s;
+  }
+  .chapter-card.done { background:rgba(126,200,168,.05);border-color:rgba(126,200,168,.18); }
+  .chapter-card.starred { border-color:rgba(245,200,66,.3);background:rgba(255,210,50,.03); }
+  .chapter-header { display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer; }
+  .chapter-body {
+    border-top:1px solid rgba(255,255,255,.06);
+    padding:12px 18px 16px;display:none;
+  }
+  .chapter-body.open { display:block; }
+  .chapter-arrow { color:#444;font-size:18px;margin-left:auto;transition:transform .2s; }
+  .chapter-arrow.open { transform:rotate(90deg); }
+  .ch-tag { font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;display:inline-block;margin-bottom:4px; }
+  .ch-name { font-size:14px;font-weight:600;line-height:1.3; }
+  .ch-time { font-size:11px;color:#666;margin-top:3px; }
+
+  /* Lecture rows */
+  .lec-row {
+    display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,.04);
+  }
+  .lec-row:last-child { border-bottom:none; }
+  .lec-check {
+    width:24px;height:24px;border-radius:6px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;transition:all .15s;
+  }
+  .lec-name { flex:1;font-size:13px; }
+  .lec-dur { font-size:12px;font-weight:700;padding:4px 9px;border-radius:12px; }
+  .lec-date { font-size:10px;color:#555;margin-top:2px; }
+
+  .bar-wrap { height:5px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:8px; }
+  .bar-fill { height:100%;border-radius:4px;transition:width .5s ease; }
+
+  .btn-row { display:flex;gap:8px;margin-bottom:12px; }
+  .btn-sm { font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:none; }
+
+  /* Daily tracker */
+  .day-row {
+    display:flex;align-items:center;gap:14px;padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,.04);
+  }
+  .day-row:last-child { border-bottom:none; }
+  .day-label { font-size:13px;font-weight:700;min-width:110px;color:#ccc; }
+  .day-bar-wrap { flex:1;height:7px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden; }
+  .day-bar-fill { height:100%;border-radius:4px;background:linear-gradient(90deg,#7EC8A8,#7EB8C8);transition:width .4s ease; }
+  .day-hrs { font-size:12px;font-weight:700;color:#7EC8A8;min-width:40px;text-align:right; }
+
+  /* Two-column daily layout */
+  #daily-layout {
+    display:grid;grid-template-columns:320px 1fr;gap:18px;
+  }
+
+  /* Subject two-column layout */
+  #subject-layout {
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    align-items:start;
+  }
+
+  /* Ring wrap */
+  .ring-wrap { position:relative;flex-shrink:0; }
+  .ring-label {
+    position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;font-weight:800;color:inherit;
+  }
 
   /* ── LIGHT MODE ── */
-  body.light{background:#F0EEE9;color:#1E1B16;}
-  body.light #header{background:linear-gradient(135deg,#E8E2D9,#EDE8E0);border-bottom:1px solid rgba(0,0,0,.07);}
-  body.light #header-label{color:#A09880;}
-  body.light #header-remaining{color:#1E1B16;}
-  body.light #header-sub{color:#9A8F80;}
-  body.light #global-bar-wrap{background:rgba(0,0,0,.08);}
-  body.light #header-pct{color:#B0A898;}
-  body.light #tabs{background:#EAE5DC;border-bottom:1px solid rgba(0,0,0,.07);}
-  body.light .tab-btn{color:#B0A898;}
-  body.light #stats-strip{background:#EAE5DC;border-bottom:1px solid rgba(0,0,0,.07);}
-  body.light .stat-pill{border-right:1px solid rgba(0,0,0,.07);}
-  body.light .stat-val{color:#1E1B16;}
-  body.light .stat-lbl{color:#A09880;}
-  body.light .card{background:#F7F4EF;border:1px solid rgba(0,0,0,.07);}
-  body.light .card.done{background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2);}
-  body.light .chapter-card{background:#F7F4EF;border:1px solid rgba(0,0,0,.07);}
-  body.light .chapter-card.done{background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2);}
-  body.light .chapter-body{border-top:1px solid rgba(0,0,0,.06);}
-  body.light .chapter-arrow{color:#C0B8AA;}
-  body.light .bar-wrap{background:rgba(0,0,0,.07);}
-  body.light .lec-row{border-bottom:1px solid rgba(0,0,0,.05);}
-  body.light .day-row{border-bottom:1px solid rgba(0,0,0,.05);}
-  body.light .day-label{color:#4A3F30;}
-  body.light .day-bar-wrap{background:rgba(0,0,0,.07);}
-  body.light .lec-date{color:#B0A898;}
-  body.light .ch-time{color:#A09880;}
-  body.light .chapter-card.starred{background:#FFFBEB;border-color:rgba(245,200,66,.3);}
-  body.light .chapter-card.starred .ch-name{color:#5A4800;}
-
-  .chapter-card.starred{border-color:rgba(245,200,66,.3);background:rgba(255,210,50,.03);}
-
-  /* ── SHARED STATIC STYLES ── */
-  #header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-  #header-right{text-align:right;}
-  .page{padding:16px;display:none;}
-  .page.visible{display:block;}
-  .card-row{display:flex;align-items:center;gap:12px;}
-  .bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
-  .ring-wrap{position:relative;flex-shrink:0;}
-  .ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:inherit;}
-  .chapter-header{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;}
-  .chapter-body.open{display:block;}
-  .chapter-arrow.open{transform:rotate(90deg);}
-  .ch-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;display:inline-block;margin-bottom:3px;}
-  .ch-name{font-size:12px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .lec-row:last-child{border-bottom:none;}
-  .lec-check{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s;}
-  .lec-name{flex:1;font-size:12px;}
-  .lec-dur{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;}
-  .btn-row{display:flex;justify-content:space-between;margin-bottom:10px;}
-  .btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:none;}
-  #countdown-wrap{font-variant-numeric:tabular-nums;}
-  #daily-panel{padding:16px;}
-  .day-row:last-child{border-bottom:none;}
-  .day-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#7EC8A8,#7EB8C8);transition:width .4s ease;}
-  .day-hrs{font-size:11px;font-weight:700;color:#7EC8A8;min-width:36px;text-align:right;}
-
-  /* ── THEME TOGGLE BUTTON ── */
-  #theme-toggle{
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:20px;
-    padding:4px 10px;
-    font-size:12px;
-    color:#aaa;
-    display:flex;align-items:center;gap:5px;
-    transition:all .25s;
-    white-space:nowrap;
-    margin-top:2px;
-  }
-  body.light #theme-toggle{
-    background:rgba(0,0,0,.07);
-    border-color:rgba(0,0,0,.12);
-    color:#7A6F60;
-  }
-
-  /* ── SETTINGS BUTTON ── */
-  #settings-btn{
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:20px;
-    padding:4px 9px;
-    font-size:13px;
-    transition:all .25s;
-  }
-  body.light #settings-btn{
-    background:rgba(0,0,0,.07);
-    border-color:rgba(0,0,0,.12);
-  }
+  body.light { background:#F0EEE9;color:#1E1B16; }
+  body.light #sidebar { background:linear-gradient(180deg,#EAE5DC 0%,#E8E2D9 100%);border-right-color:rgba(0,0,0,.08); }
+  body.light #sidebar-brand { border-bottom-color:rgba(0,0,0,.07); }
+  body.light #brand-label { color:#A09880; }
+  body.light #brand-title { color:#1E1B16; }
+  body.light #hero-remaining { color:#1E1B16; }
+  body.light #hero-sub,body.light #hero-pct { color:#A09880; }
+  body.light #global-bar-wrap { background:rgba(0,0,0,.08); }
+  body.light #sidebar-stats { background:rgba(0,0,0,.05); }
+  body.light .stat-cell { background:#EAE5DC; }
+  body.light .stat-val { color:#1E1B16; }
+  body.light .stat-lbl { color:#A09880; }
+  body.light .nav-btn { color:#A09880; }
+  body.light .nav-btn:hover { background:rgba(0,0,0,.06);color:#4A3F30; }
+  body.light .nav-btn.active { background:rgba(0,0,0,.08);color:#1E1B16; }
+  body.light #theme-toggle,body.light #settings-btn { background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.1);color:#7A6F60; }
+  body.light #main { background:#F0EEE9; }
+  body.light #topbar { background:#EDE8E0;border-bottom-color:rgba(0,0,0,.07); }
+  body.light .card { background:#F7F4EF;border-color:rgba(0,0,0,.07); }
+  body.light .card.done { background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2); }
+  body.light .overview-subject-card { background:#F7F4EF;border-color:rgba(0,0,0,.07); }
+  body.light .overview-subject-card:hover { background:#EFE9DF;border-color:rgba(0,0,0,.1); }
+  body.light .chapter-card { background:#F7F4EF;border-color:rgba(0,0,0,.07); }
+  body.light .chapter-card.done { background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2); }
+  body.light .chapter-card.starred { background:#FFFBEB;border-color:rgba(245,200,66,.3); }
+  body.light .chapter-card.starred .ch-name { color:#5A4800; }
+  body.light .chapter-body { border-top-color:rgba(0,0,0,.06); }
+  body.light .chapter-arrow { color:#C0B8AA; }
+  body.light .bar-wrap { background:rgba(0,0,0,.07); }
+  body.light .lec-row { border-bottom-color:rgba(0,0,0,.05); }
+  body.light .lec-date { color:#B0A898; }
+  body.light .ch-time { color:#A09880; }
+  body.light .day-row { border-bottom-color:rgba(0,0,0,.05); }
+  body.light .day-label { color:#4A3F30; }
+  body.light .day-bar-wrap { background:rgba(0,0,0,.07); }
+  body.light .nav-section-label { color:#C0B8AA; }
+  body.light ::-webkit-scrollbar-thumb { background:rgba(0,0,0,.12); }
 
   /* ── SETTINGS MODAL ── */
-  #settings-inner{
-    background:#1A1D28;
-    border-radius:22px 22px 0 0;
+  #settings-overlay {
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(4px);
+  }
+  #settings-modal {
+    display:none;position:fixed;
+    top:50%;left:50%;transform:translate(-50%,-50%);
+    width:480px;max-width:95vw;z-index:201;
+    border-radius:20px;
+  }
+  #settings-inner {
+    background:#141720;border-radius:20px;
     border:1px solid rgba(255,255,255,.08);
-    border-bottom:none;
+    padding-bottom:22px;
   }
-  body.light #settings-inner{background:#F0EEE9;border-color:rgba(0,0,0,.08);}
-  #settings-card-1,#settings-card-2,#settings-card-3{
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.07);
+  body.light #settings-inner { background:#F0EEE9;border-color:rgba(0,0,0,.08); }
+  #settings-card-1,#settings-card-2,#settings-card-3 {
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
   }
-  body.light #settings-card-1,body.light #settings-card-2,body.light #settings-card-3{
-    background:rgba(0,0,0,.04);
-    border-color:rgba(0,0,0,.07);
+  body.light #settings-card-1,body.light #settings-card-2,body.light #settings-card-3 {
+    background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.07);
   }
-  #export-btn{
+  #export-btn {
     background:linear-gradient(135deg,#7EC8A8,#5aaa88);
     color:#0F1117;
   }
-  #import-label{
-    background:rgba(126,184,200,.15);
-    border:1px dashed rgba(126,184,200,.4);
-    color:#7EB8C8;
+  #import-label {
+    background:rgba(126,184,200,.15);border:1px dashed rgba(126,184,200,.4);color:#7EB8C8;
   }
-  body.light #export-btn{color:#fff;}
-  body.light #import-label{background:rgba(62,140,168,.1);border-color:rgba(62,140,168,.3);color:#3A8BA8;}
-  #settings-modal button:not(#settings-btn):not(#export-btn){
-    background:rgba(232,168,124,.15);
-    border:1px solid rgba(232,168,124,.3);
-    color:#E8A87C;
+  body.light #export-btn { color:#fff; }
+  body.light #import-label { background:rgba(62,140,168,.1);border-color:rgba(62,140,168,.3);color:#3A8BA8; }
+  #settings-modal button:not(#settings-btn):not(#export-btn):not(.close-settings-btn) {
+    background:rgba(232,168,124,.15);border:1px solid rgba(232,168,124,.3);color:#E8A87C;
   }
-  body.light #settings-modal button:not(#settings-btn):not(#export-btn){
-    background:rgba(196,119,65,.1);
-    border-color:rgba(196,119,65,.3);
-    color:#C47741;
+  body.light #settings-modal button:not(#settings-btn):not(#export-btn):not(.close-settings-btn) {
+    background:rgba(196,119,65,.1);border-color:rgba(196,119,65,.3);color:#C47741;
+  }
+  .close-settings-btn {
+    background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.1)!important;
+    border-radius:50%!important;width:30px!important;height:30px!important;
+    font-size:15px!important;color:#aaa!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
   }
 </style>
 </head>
 <body>
 
-<div id="header">
-  <div id="header-top">
-    <div>
-      <div id="header-label">CA Prep · Hours</div>
-      <div id="header-title">Duration Tracker</div>
+<div id="app">
+  <aside id="sidebar">
+    <div id="sidebar-brand">
+      <div id="brand-label">CA Prep · Hours</div>
+      <div id="brand-title">Duration Tracker</div>
+      <div id="brand-sub">Track. Study. Clear.</div>
     </div>
-    <div id="header-right">
-      <div id="header-remaining">—</div>
-      <div id="header-sub">remaining</div>
-      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:2px">
-        <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
-        <button id="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+
+    <div id="sidebar-hero">
+      <div id="hero-ring-wrap"></div>
+      <div id="hero-text">
+        <div id="hero-remaining">—</div>
+        <div id="hero-sub">remaining</div>
+        <div id="hero-pct"></div>
       </div>
     </div>
-  </div>
-  <div id="global-bar-wrap"><div id="global-bar" style="width:0%"></div></div>
-  <div id="header-pct"></div>
-</div>
+    <div id="global-bar-wrap"><div id="global-bar" style="width:0%"></div></div>
 
-<div id="stats-strip">
-  <div class="stat-pill">
-    <div class="stat-val" id="stat-chapters">—</div>
-    <div class="stat-lbl">Chapters Done</div>
-  </div>
-  <div class="stat-pill">
-    <div class="stat-val" id="stat-days">—</div>
-    <div class="stat-lbl">Days Left</div>
-  </div>
-  <div class="stat-pill" style="min-width:110px">
-    <div class="stat-val" id="stat-countdown" style="font-size:11px;color:#E8A87C;">—</div>
-    <div class="stat-lbl">To next day ↓</div>
-  </div>
-  <div class="stat-pill" style="min-width:110px">
-    <div class="stat-val" id="stat-completion" style="font-size:11px;color:#7EC8A8;">—</div>
-    <div class="stat-lbl">Done by 🎯</div>
-  </div>
-</div>
+    <div id="sidebar-stats">
+      <div class="stat-cell">
+        <div class="stat-val" id="stat-chapters">—</div>
+        <div class="stat-lbl">Chapters Done</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val" id="stat-days">—</div>
+        <div class="stat-lbl">Days Left</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val" id="stat-countdown" style="font-size:12px;color:#E8A87C;">—</div>
+        <div class="stat-lbl">To next day ↓</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val" id="stat-completion" style="font-size:12px;color:#7EC8A8;">—</div>
+        <div class="stat-lbl">Done by 🎯</div>
+      </div>
+    </div>
 
-<div id="tabs"></div>
-<div id="pages"></div>
+    <nav id="sidebar-nav">
+      <div class="nav-section-label">Views</div>
+      <button class="nav-btn" id="nav-daily" onclick="switchTab('daily')">
+        <span class="nav-dot" style="background:#7EC8A8"></span>
+        📅 Daily Log
+      </button>
+      <button class="nav-btn" id="nav-overview" onclick="switchTab('overview')">
+        <span class="nav-dot" style="background:#888"></span>
+        Overview
+      </button>
+
+      <div class="nav-section-label" style="margin-top:12px">Subjects</div>
+      <div id="subject-nav-btns"></div>
+    </nav>
+
+    <div id="sidebar-footer">
+      <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+      <button id="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+    </div>
+  </aside>
+
+  <div id="resizer"></div>
+
+  <main id="main">
+    <div id="topbar">
+      <div>
+        <div id="topbar-title">Overview</div>
+        <div id="topbar-sub"></div>
+      </div>
+    </div>
+    <div id="content"></div>
+  </main>
+</div>
 
 <script>
+// --- Resizer Logic ---
+const resizer = document.getElementById('resizer');
+const sidebar = document.getElementById('sidebar');
+let isResizing = false;
+
+resizer.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  document.body.style.cursor = 'col-resize';
+});
+document.addEventListener('mousemove', (e) => {
+  if (!isResizing) return;
+  let newWidth = e.clientX;
+  if (newWidth < 220) newWidth = 220;
+  if (newWidth > 600) newWidth = 600;
+  sidebar.style.setProperty('--sidebar-width', newWidth + 'px');
+});
+document.addEventListener('mouseup', () => {
+  if (isResizing) {
+    isResizing = false;
+    document.body.style.cursor = 'default';
+    try { localStorage.setItem('ca_sidebar_width', sidebar.style.getPropertyValue('--sidebar-width')); } catch{}
+  }
+});
+
+// Load saved sidebar width
+try {
+  const savedWidth = localStorage.getItem('ca_sidebar_width');
+  if (savedWidth) sidebar.style.setProperty('--sidebar-width', savedWidth);
+} catch{}
+
+// --- Core Data & Logic ---
 const D = v => Math.round(v * 24 * 60);
 
 const SUBJECTS = [
@@ -440,10 +679,9 @@ const STORAGE_KEY = "hours_tracker_html_v1";
 const TIMESTAMPS_KEY = "hours_tracker_timestamps_v1";
 const STARRED_KEY = "hours_tracker_starred_v1";
 
-// --- State ---
 let watched = {};
-let timestamps = {}; // lecId -> ISO date string when ticked
-let starred = {};    // chapterId -> true
+let timestamps = {};
+let starred = {};
 
 function initState() {
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(l => { watched[l.id] = l.done; })));
@@ -457,7 +695,6 @@ function save() {
   try { localStorage.setItem(STARRED_KEY, JSON.stringify(starred)); } catch{}
 }
 
-// --- Utils ---
 function fmtMins(m) {
   const h = Math.floor(m/60), mm = Math.round(m%60);
   if(h===0) return mm+'m';
@@ -479,8 +716,6 @@ function globalStats() {
   SUBJECTS.forEach(s=>{ const ss=subStats(s); total+=ss.total; done+=ss.done; });
   return {total,done,remaining:total-done,pct:total?Math.round(done/total*100):0};
 }
-
-// --- Feature 1: Chapter counter ---
 function chapterStats() {
   let total=0, done=0;
   SUBJECTS.forEach(s => s.chapters.forEach(ch => {
@@ -490,7 +725,6 @@ function chapterStats() {
   }));
   return {total, done};
 }
-
 function lectureStats() {
   let total=0, done=0;
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
@@ -500,21 +734,15 @@ function lectureStats() {
   return {total, done, pct: total ? Math.round(done/total*100) : 0};
 }
 
-// --- Feature 2 & 3: Days left + countdown ---
 const HOURS_PER_DAY = 6;
 function daysLeft(remainingMins) {
-  const remainingHours = remainingMins / 60;
-  return Math.ceil(remainingHours / HOURS_PER_DAY);
+  return Math.ceil((remainingMins/60) / HOURS_PER_DAY);
 }
-// Time until remaining hours crosses the next whole "day" boundary
-// i.e. how much more do I need to watch before days drops by 1
 function timeToNextDayDrop(remainingMins) {
   const remainingHours = remainingMins / 60;
   const currentDays = Math.ceil(remainingHours / HOURS_PER_DAY);
-  // next lower day threshold: (currentDays - 1) * 6 hours
   const nextThresholdHours = (currentDays - 1) * HOURS_PER_DAY;
-  const minsToGo = (remainingHours - nextThresholdHours) * 60;
-  return minsToGo; // in minutes
+  return (remainingHours - nextThresholdHours) * 60;
 }
 function fmtCountdown(mins) {
   if(mins <= 0) return '0:00:00';
@@ -525,9 +753,8 @@ function fmtCountdown(mins) {
   return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// --- Feature 4: Daily hours tracker ---
 function getDailyLog() {
-  const log = {}; // "YYYY-MM-DD" -> total mins
+  const log = {};
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
     if(watched[lec.id] && timestamps[lec.id]) {
       const d = timestamps[lec.id].slice(0,10);
@@ -539,8 +766,7 @@ function getDailyLog() {
 function renderDailyTracker() {
   const log = getDailyLog();
   const days = Object.keys(log).sort().reverse();
-  if(days.length === 0) return `<div style="text-align:center;color:#444;font-size:12px;padding:30px 0">No sessions recorded yet.<br><span style="font-size:10px">Tick a lecture to start tracking.</span></div>`;
-  const maxMins = Math.max(...Object.values(log));
+  if(days.length === 0) return `<div style="text-align:center;color:#444;font-size:13px;padding:32px 0">No sessions recorded yet.<br><span style="font-size:11px">Tick a lecture to start tracking.</span></div>`;
   const hoursGoal = HOURS_PER_DAY * 60;
   return days.map(d => {
     const mins = log[d];
@@ -557,7 +783,6 @@ function renderDailyTracker() {
   }).join('');
 }
 
-// --- SVG Ring ---
 function makeSVGRing(pct, size, sw, color, labelSize) {
   const r = (size - sw*2)/2;
   const circ = 2*Math.PI*r;
@@ -569,64 +794,64 @@ function makeSVGRing(pct, size, sw, color, labelSize) {
         stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
         style="transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)"/>
     </svg>
-    <div class="ring-label" style="color:${color};font-size:${labelSize||11}px;">${Math.round(pct)}%</div>
+    <div class="ring-label" style="color:${color};font-size:${labelSize||12}px;">${Math.round(pct)}%</div>
   </div>`;
 }
 
-// --- Current view ---
 let currentTab = 'overview';
 let expandedChapter = null;
 
-// --- Render header ---
+// --- Sidebar subject nav buttons ---
+function renderSubjectNavBtns() {
+  const wrap = document.getElementById('subject-nav-btns');
+  wrap.innerHTML = SUBJECTS.map(s => {
+    const ss = subStats(s);
+    const isActive = currentTab === s.id;
+    return `<button class="nav-btn${isActive?' active':''}" id="nav-${s.id}" onclick="switchTab('${s.id}')">
+      <span class="nav-dot" style="background:${s.color}"></span>
+      ${s.short}
+      <span class="nav-pct" style="color:${s.color}">${ss.pct}%</span>
+    </button>`;
+  }).join('');
+}
+
+function updateActiveNav() {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const active = document.getElementById('nav-' + currentTab);
+  if(active) active.classList.add('active');
+}
+
 function renderHeader() {
   const g = globalStats();
-  document.getElementById('header-remaining').textContent = fmtMins(g.remaining);
-  document.getElementById('header-sub').textContent = `remaining of ${fmtMins(g.total)}`;
+  document.getElementById('hero-remaining').textContent = fmtMins(g.remaining);
+  document.getElementById('hero-sub').textContent = `remaining of ${fmtMins(g.total)}`;
   document.getElementById('global-bar').style.width = g.pct+'%';
-  document.getElementById('header-pct').textContent = `${g.pct}% watched · ${fmtMins(g.done)} done`;
+  document.getElementById('hero-pct').textContent = `${g.pct}% watched · ${fmtMins(g.done)} done`;
 
-  // Feature 1: chapter counter
+  document.getElementById('hero-ring-wrap').innerHTML = makeSVGRing(g.pct, 60, 6, '#7EC8A8', 11);
+
   const ch = chapterStats();
   document.getElementById('stat-chapters').textContent = `${ch.done}/${ch.total}`;
 
-  // Feature 2: days left
   const days = daysLeft(g.remaining);
   document.getElementById('stat-days').textContent = days > 0 ? `${days}d` : '🎉 Done';
 
-  // Feature 3: countdown to next day drop
   const mins = timeToNextDayDrop(g.remaining);
   document.getElementById('stat-countdown').textContent = fmtCountdown(mins) + ' to go';
 
-  // Feature 5: syllabus completion date
   const compEl = document.getElementById('stat-completion');
   if(days <= 0) {
     compEl.textContent = '🎉 Done!';
   } else {
-    const today = new Date();
-    today.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0,0,0,0);
     const completionDate = new Date(today);
     completionDate.setDate(today.getDate() + days);
-    const opts = {day:'numeric',month:'short'};
-    const dateStr = completionDate.toLocaleDateString('en-IN', opts);
-    compEl.textContent = dateStr;
+    compEl.textContent = completionDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
   }
 }
 
-// --- Render tabs ---
-function renderTabs() {
-  const tabsEl = document.getElementById('tabs');
-  const tabs = [{id:'daily',label:'📅 Daily',color:'#7EC8A8'}, {id:'overview',label:'Overview',color:'#888'}, ...SUBJECTS.map(s=>({id:s.id,label:s.short,color:s.color}))];
-  tabsEl.innerHTML = tabs.map(t => {
-    const isActive = currentTab==='overview' ? t.id==='overview' : t.id===currentTab;
-    return `<button class="tab-btn${isActive?' active':''}" style="--col:${t.color};${isActive?'color:'+t.color:''}" onclick="switchTab('${t.id}')">${t.label}</button>`;
-  }).join('');
-}
-
-// --- Render overview ---
 function renderOverview() {
   const g = globalStats();
-
-  // Build starred list
   const starredList = [];
   SUBJECTS.forEach(sub => sub.chapters.forEach(ch => {
     if(starred[ch.id]) starredList.push({sub, ch});
@@ -634,212 +859,235 @@ function renderOverview() {
   let starredCard = '';
   if(starredList.length > 0) {
     const rows = starredList.map(({sub,ch}) =>
-      `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,210,50,.08);cursor:pointer" onclick="switchTab('${sub.id}')">
-        <span style="font-size:13px">⭐</span>
+      `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,210,50,.08);cursor:pointer" onclick="switchTab('${sub.id}')">
+        <span style="font-size:14px">⭐</span>
         <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ch.name}</div>
-          <div style="font-size:10px;color:#888">${sub.short}</div>
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${ch.name}</div>
+          <div style="font-size:11px;color:#888">${sub.short}</div>
         </div>
-        <button onclick="(function(e){e.stopPropagation();starred['${ch.id}']=false;delete starred['${ch.id}'];save();render();})(event)" style="background:rgba(255,210,50,.12);border:1px solid rgba(255,210,50,.3);color:#F5C842;font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;cursor:pointer">✕ Clear</button>
+        <button onclick="(function(e){e.stopPropagation();starred['${ch.id}']=false;delete starred['${ch.id}'];save();render();})(event)" style="background:rgba(255,210,50,.12);border:1px solid rgba(255,210,50,.3);color:#F5C842;font-size:10px;font-weight:700;padding:4px 9px;border-radius:12px;cursor:pointer">✕ Clear</button>
       </div>`
     ).join('');
-    starredCard = `<div class="card" style="border-radius:14px;padding:14px 16px;margin-bottom:14px;border-color:rgba(255,210,50,.2);background:rgba(255,210,50,.04)">
-      <div style="font-size:11px;font-weight:700;color:#F5C842;letter-spacing:.5px;margin-bottom:6px">⭐ CHECK NEW RESOURCES</div>
+    starredCard = `<div class="card" style="border-color:rgba(255,210,50,.2);background:rgba(255,210,50,.04);margin-top:16px;margin-bottom:0">
+      <div style="font-size:12px;font-weight:700;color:#F5C842;letter-spacing:.5px;margin-bottom:8px">⭐ CHECK NEW RESOURCES</div>
       ${rows}
     </div>`;
   }
 
-  let html = `<div class="card" style="border-radius:18px;padding:18px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
-    <div class="card-row">
-      ${makeSVGRing(g.pct,72,7,'#7EC8A8',12)}
-      <div>
-        <div style="font-size:13px;color:#888;margin-bottom:4px">Total Course</div>
-        <div style="font-size:22px;font-weight:800">${fmtMins(g.remaining)} <span style="font-size:13px;color:#666;font-weight:400">left</span></div>
-        <div style="font-size:12px;color:#555">${fmtMins(g.done)} watched · ${fmtMins(g.total)} total</div>
-      </div>
-    </div>
-  </div>`;
-  SUBJECTS.forEach(sub => {
-    const s = subStats(sub);
-    html += `<div class="card card-row" style="cursor:pointer" onclick="switchTab('${sub.id}')">
-      ${makeSVGRing(s.pct,50,5,sub.color,9)}
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub.name}</div>
-        <div style="font-size:11px;color:#666;margin-bottom:6px">
-          <span style="color:${sub.color}">${fmtMins(s.remaining)} left</span> · ${fmtMins(s.done)} done · ${fmtMins(s.total)} total
-        </div>
-        <div class="bar-wrap"><div class="bar-fill" style="width:${s.pct}%;background:${sub.color}"></div></div>
-      </div>
-      <div style="color:#444;font-size:18px;margin-left:8px">›</div>
-    </div>`;
-  });
   const lv = lectureStats();
-  const videoCard = `<div class="card" style="border-radius:14px;padding:14px 16px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.5px;text-transform:uppercase">Videos Watched</div>
-      <div style="font-size:11px;font-weight:800;color:#7EC8A8">${lv.pct}%</div>
+  const videoCard = `<div class="card" style="margin-bottom:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;color:#888;letter-spacing:.5px;text-transform:uppercase">Videos Watched</div>
+      <div style="font-size:12px;font-weight:800;color:#7EC8A8">${lv.pct}%</div>
     </div>
-    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
-      <div style="font-size:22px;font-weight:800;color:#fff">${lv.done}</div>
-      <div style="font-size:13px;color:#555">/ ${lv.total} lectures</div>
-      <div style="font-size:11px;color:#666;margin-left:auto">${lv.total - lv.done} remaining</div>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+      <div style="font-size:24px;font-weight:800;color:#fff">${lv.done}</div>
+      <div style="font-size:14px;color:#555">/ ${lv.total} lectures</div>
+      <div style="font-size:12px;color:#666;margin-left:auto">${lv.total - lv.done} remaining</div>
     </div>
     <div class="bar-wrap"><div class="bar-fill" style="width:${lv.pct}%;background:linear-gradient(90deg,#7EC8A8,#7EB8C8)"></div></div>
   </div>`;
-  html += videoCard;
-  html += starredCard;
-  return html;
-}
 
-// --- Render subject ---
-function renderSubject(sub) {
-  const ss = subStats(sub);
-  let html = `<div class="card card-row" style="border-radius:16px;padding:16px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
-    ${makeSVGRing(ss.pct,64,6,sub.color,11)}
-    <div>
-      <div style="font-size:14px;font-weight:700">${sub.name}</div>
-      <div style="font-size:20px;font-weight:800;margin-top:2px">${fmtMins(ss.remaining)} <span style="font-size:12px;color:#666;font-weight:400">remaining</span></div>
-      <div style="font-size:11px;color:#666">${fmtMins(ss.done)} done · ${fmtMins(ss.total)} total</div>
+  // Total course hero card
+  const heroCard = `<div class="card" style="margin-bottom:16px;padding:20px 22px">
+    <div style="display:flex;align-items:center;gap:18px">
+      ${makeSVGRing(g.pct,86,8,'#7EC8A8',14)}
+      <div>
+        <div style="font-size:14px;color:#888;margin-bottom:5px">Total Course</div>
+        <div style="font-size:28px;font-weight:800">${fmtMins(g.remaining)} <span style="font-size:15px;color:#666;font-weight:400">left</span></div>
+        <div style="font-size:13px;color:#555">${fmtMins(g.done)} watched · ${fmtMins(g.total)} total</div>
+      </div>
     </div>
   </div>`;
 
-  // compute difficulty dots: rank chapters by total mins within this subject
+  // Subject cards in 2-col grid
+  const subjectCards = SUBJECTS.map(sub => {
+    const s = subStats(sub);
+    return `<div class="overview-subject-card" onclick="switchTab('${sub.id}')">
+      ${makeSVGRing(s.pct,54,5,sub.color,10)}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub.name}</div>
+        <div style="font-size:12px;color:#666;margin-bottom:8px">
+          <span style="color:${sub.color}">${fmtMins(s.remaining)} left</span> · ${fmtMins(s.done)} done
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${s.pct}%;background:${sub.color}"></div></div>
+      </div>
+      <div style="color:#444;font-size:20px;">›</div>
+    </div>`;
+  }).join('');
+
+  return `${heroCard}
+    <div id="overview-grid">${subjectCards}</div>
+    ${videoCard}
+    ${starredCard}`;
+}
+
+function renderSubject(sub) {
+  const ss = subStats(sub);
+  const subHero = `<div class="card" style="margin-bottom:16px;padding:18px 20px">
+    <div style="display:flex;align-items:center;gap:16px">
+      ${makeSVGRing(ss.pct,68,6,sub.color,12)}
+      <div>
+        <div style="font-size:15px;font-weight:700">${sub.name}</div>
+        <div style="font-size:22px;font-weight:800;margin-top:3px">${fmtMins(ss.remaining)} <span style="font-size:13px;color:#666;font-weight:400">remaining</span></div>
+        <div style="font-size:12px;color:#666">${fmtMins(ss.done)} done · ${fmtMins(ss.total)} total</div>
+      </div>
+    </div>
+  </div>`;
+
   const chTotals = sub.chapters.map(c => c.lectures.reduce((s,l)=>s+l.mins,0));
   const minTotal = Math.min(...chTotals);
   const maxTotal = Math.max(...chTotals);
 
-  sub.chapters.forEach((ch, idx) => {
-    const cs = chStats(ch);
-    const isOpen = expandedChapter === ch.id;
-    const lecCount = ch.lectures.length;
+  // Split chapters into two columns
+  const half = Math.ceil(sub.chapters.length / 2);
+  const leftChs = sub.chapters.slice(0, half);
+  const rightChs = sub.chapters.slice(half);
 
-    // difficulty: 1–5 dots based on total duration relative to subject min/max
-    const chTotal = chTotals[idx];
-    let dots;
-    if(maxTotal === minTotal) {
-      dots = 3;
-    } else {
-      dots = Math.round(1 + ((chTotal - minTotal) / (maxTotal - minTotal)) * 4);
-    }
-    const dotColor = cs.allDone ? '#7EC8A8' : sub.color;
-    const dotHTML = Array.from({length:5},(_,i) =>
-      `<span style="font-size:8px;color:${i < dots ? dotColor : 'rgba(128,128,128,.25)'}">●</span>`
-    ).join('');
+  function renderChapters(chapters, startIdx) {
+    return chapters.map((ch, i) => {
+      const idx = startIdx + i;
+      const cs = chStats(ch);
+      const isOpen = expandedChapter === ch.id;
+      const lecCount = ch.lectures.length;
+      const chTotal = chTotals[idx];
+      let dots;
+      if(maxTotal === minTotal) { dots = 3; }
+      else { dots = Math.round(1 + ((chTotal - minTotal) / (maxTotal - minTotal)) * 4); }
+      const dotColor = cs.allDone ? '#7EC8A8' : sub.color;
+      const dotHTML = Array.from({length:5},(_,i) =>
+        `<span style="font-size:9px;color:${i < dots ? dotColor : 'rgba(128,128,128,.25)'}">●</span>`
+      ).join('');
+      const isStarred = !!starred[ch.id];
 
-    const isStarred = !!starred[ch.id];
-
-    html += `<div class="chapter-card${cs.allDone?' done':''}${isStarred?' starred':''}" id="chcard_${ch.id}">
-      <div class="chapter-header" onclick="toggleChapter('${ch.id}')">
-        ${makeSVGRing(cs.pct,40,4,cs.allDone?'#7EC8A8':sub.color,9)}
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-            <span class="ch-tag" style="color:${sub.accent};background:${sub.color}22">Ch ${idx+1}</span>
-            ${cs.allDone?'<span style="font-size:12px">✓</span>':''}
-            ${isStarred?'<span style="font-size:12px;line-height:1" title="New resources available">⭐</span>':''}
-            <span style="font-size:9px;color:#666;font-weight:600;margin-left:2px">${lecCount} lec${lecCount!==1?'s':''}</span>
-            <span style="margin-left:2px;letter-spacing:1px">${dotHTML}</span>
-          </div>
-          <div class="ch-name">${ch.name}</div>
-          <div class="ch-time">${cs.allDone
-            ? `<span style="color:#7EC8A8">Complete · ${fmtMins(cs.total)}</span>`
-            : `<span style="color:${sub.color}">${fmtMins(cs.remaining)} left</span> · ${fmtMins(cs.done)}/${fmtMins(cs.total)}`
-          }</div>
-        </div>
-        <span class="chapter-arrow${isOpen?' open':''}">›</span>
-      </div>
-      <div class="chapter-body${isOpen?' open':''}" id="chbody_${ch.id}">
-        <div class="btn-row">
-          <button class="btn-sm" style="background:${sub.color}22;color:${sub.color};border:1px solid ${sub.color}44"
-            onclick="markAll('${sub.id}','${ch.id}',true)">✓ All done</button>
-          <button class="btn-sm" style="background:rgba(255,255,255,.04);color:#666;border:1px solid rgba(255,255,255,.1)"
-            onclick="markAll('${sub.id}','${ch.id}',false)">✗ Reset</button>
-          <button class="btn-sm" onclick="toggleStar('${sub.id}','${ch.id}',event)" style="background:${isStarred?'rgba(255,210,50,.15)':'rgba(255,255,255,.04)'};color:${isStarred?'#F5C842':'#666'};border:1px solid ${isStarred?'rgba(255,210,50,.35)':'rgba(255,255,255,.1)'}">
-            ${isStarred?'★ Starred':'☆ Star'}
-          </button>
-        </div>
-        ${ch.lectures.map((lec,li) => {
-          const isDone = !!watched[lec.id];
-          const checkBg = isDone ? (cs.allDone?'#7EC8A8':sub.color) : 'rgba(255,255,255,.07)';
-          const checkColor = isDone ? '#0F1117' : '#444';
-          const durBg = isDone ? 'rgba(255,255,255,.04)' : sub.color+'18';
-          const durColor = isDone ? '#555' : sub.color;
-          let dateBadge = '';
-          if(isDone && timestamps[lec.id]) {
-            const d = new Date(timestamps[lec.id]);
-            dateBadge = `<div class="lec-date">${d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>`;
-          }
-          return `<div class="lec-row" onclick="toggleLec('${sub.id}','${ch.id}','${lec.id}')">
-            <div class="lec-check" style="background:${checkBg};color:${checkColor}">${isDone?'✓':li+1}</div>
-            <div style="flex:1">
-              <div class="lec-name" style="color:${isDone?'#888':'#ddd'};text-decoration:${isDone?'line-through':'none'}">Lecture ${li+1}</div>
-              ${dateBadge}
+      return `<div class="chapter-card${cs.allDone?' done':''}${isStarred?' starred':''}" id="chcard_${ch.id}">
+        <div class="chapter-header" onclick="toggleChapter('${ch.id}')">
+          ${makeSVGRing(cs.pct,44,4,cs.allDone?'#7EC8A8':sub.color,10)}
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+              <span class="ch-tag" style="color:${sub.accent};background:${sub.color}22">Ch ${idx+1}</span>
+              ${cs.allDone?'<span style="font-size:13px">✓</span>':''}
+              ${isStarred?'<span style="font-size:13px;line-height:1">⭐</span>':''}
+              <span style="font-size:10px;color:#666;font-weight:600">${lecCount} lec${lecCount!==1?'s':''}</span>
+              <span style="letter-spacing:1px">${dotHTML}</span>
             </div>
-            <div class="lec-dur" style="background:${durBg};color:${durColor}">${fmtMins(lec.mins)}</div>
-          </div>`;
-        }).join('')}
-      </div>
+            <div class="ch-name">${ch.name}</div>
+            <div class="ch-time">${cs.allDone
+              ? `<span style="color:#7EC8A8">Complete · ${fmtMins(cs.total)}</span>`
+              : `<span style="color:${sub.color}">${fmtMins(cs.remaining)} left</span> · ${fmtMins(cs.done)}/${fmtMins(cs.total)}`
+            }</div>
+          </div>
+          <span class="chapter-arrow${isOpen?' open':''}">›</span>
+        </div>
+        <div class="chapter-body${isOpen?' open':''}" id="chbody_${ch.id}">
+          <div class="btn-row">
+            <button class="btn-sm" style="background:${sub.color}22;color:${sub.color};border:1px solid ${sub.color}44"
+              onclick="markAll('${sub.id}','${ch.id}',true)">✓ All done</button>
+            <button class="btn-sm" style="background:rgba(255,255,255,.04);color:#666;border:1px solid rgba(255,255,255,.1)"
+              onclick="markAll('${sub.id}','${ch.id}',false)">✗ Reset</button>
+            <button class="btn-sm" onclick="toggleStar('${sub.id}','${ch.id}',event)" style="background:${isStarred?'rgba(255,210,50,.15)':'rgba(255,255,255,.04)'};color:${isStarred?'#F5C842':'#666'};border:1px solid ${isStarred?'rgba(255,210,50,.35)':'rgba(255,255,255,.1)'}">
+              ${isStarred?'★ Starred':'☆ Star'}
+            </button>
+          </div>
+          ${ch.lectures.map((lec,li) => {
+            const isDone = !!watched[lec.id];
+            const checkBg = isDone ? (cs.allDone?'#7EC8A8':sub.color) : 'rgba(255,255,255,.07)';
+            const checkColor = isDone ? '#0F1117' : '#444';
+            const durBg = isDone ? 'rgba(255,255,255,.04)' : sub.color+'18';
+            const durColor = isDone ? '#555' : sub.color;
+            let dateBadge = '';
+            if(isDone && timestamps[lec.id]) {
+              const d = new Date(timestamps[lec.id]);
+              dateBadge = `<div class="lec-date">${d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>`;
+            }
+            return `<div class="lec-row" onclick="toggleLec('${sub.id}','${ch.id}','${lec.id}')">
+              <div class="lec-check" style="background:${checkBg};color:${checkColor}">${isDone?'✓':li+1}</div>
+              <div style="flex:1">
+                <div class="lec-name" style="color:${isDone?'#888':'#ddd'};text-decoration:${isDone?'line-through':'none'}">Lecture ${li+1}</div>
+                ${dateBadge}
+              </div>
+              <div class="lec-dur" style="background:${durBg};color:${durColor}">${fmtMins(lec.mins)}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  return `${subHero}
+    <div id="subject-layout">
+      <div>${renderChapters(leftChs, 0)}</div>
+      <div>${renderChapters(rightChs, half)}</div>
     </div>`;
-  });
-  return html;
 }
 
-// --- Full render ---
 function render() {
   renderHeader();
-  renderTabs();
-  const pages = document.getElementById('pages');
+  renderSubjectNavBtns();
+  updateActiveNav();
+
+  const content = document.getElementById('content');
+  const topbarTitle = document.getElementById('topbar-title');
+  const topbarSub = document.getElementById('topbar-sub');
+
   if(currentTab === 'overview') {
-    pages.innerHTML = `<div class="page visible">${renderOverview()}</div>`;
+    topbarTitle.textContent = 'Overview';
+    topbarSub.textContent = 'All subjects at a glance';
+    content.innerHTML = renderOverview();
   } else if(currentTab === 'daily') {
     const g = globalStats();
     const totalLogged = Object.values(getDailyLog()).reduce((a,b)=>a+b,0);
-    pages.innerHTML = `<div class="page visible">
-      <div class="card" style="border-radius:18px;padding:16px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
-        <div style="font-size:13px;color:#888;margin-bottom:10px;font-weight:600">Study Sessions</div>
-        <div style="display:flex;gap:16px;margin-bottom:4px">
-          <div><div style="font-size:18px;font-weight:800">${(totalLogged/60).toFixed(1)}h</div><div style="font-size:10px;color:#555">Total logged</div></div>
-          <div><div style="font-size:18px;font-weight:800;color:#E8A87C">${HOURS_PER_DAY}h/day</div><div style="font-size:10px;color:#555">Daily goal</div></div>
+    topbarTitle.textContent = 'Daily Log';
+    topbarSub.textContent = 'Study sessions over time';
+    content.innerHTML = `<div id="daily-layout">
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-size:14px;color:#888;margin-bottom:12px;font-weight:600">Study Sessions</div>
+          <div style="display:flex;gap:18px;margin-bottom:6px">
+            <div><div style="font-size:22px;font-weight:800">${(totalLogged/60).toFixed(1)}h</div><div style="font-size:11px;color:#555">Total logged</div></div>
+            <div><div style="font-size:22px;font-weight:800;color:#E8A87C">${HOURS_PER_DAY}h/day</div><div style="font-size:11px;color:#555">Daily goal</div></div>
+          </div>
+          <div style="font-size:11px;color:#444;margin-top:8px">Bar = % of ${HOURS_PER_DAY}h daily goal · Orange = halfway · Green = goal met</div>
         </div>
-        <div style="font-size:10px;color:#444;margin-top:6px">Bar = % of ${HOURS_PER_DAY}h daily goal · Orange = halfway · Green = goal met</div>
       </div>
-      <div class="card" style="padding:14px 16px">
-        ${renderDailyTracker()}
+      <div>
+        <div class="card">${renderDailyTracker()}</div>
       </div>
     </div>`;
   } else {
     const sub = SUBJECTS.find(s=>s.id===currentTab);
-    pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
+    topbarTitle.textContent = sub.name;
+    topbarSub.textContent = `${sub.chapters.length} chapters · ${subStats(sub).pct}% complete`;
+    content.innerHTML = renderSubject(sub);
   }
 }
 
-// --- Actions ---
 window.switchTab = function(id) {
-  currentTab = (id === 'overview' || id === 'daily') ? id : id;
+  currentTab = id;
   expandedChapter = null;
   render();
-  window.scrollTo(0,0);
+  document.getElementById('content').scrollTop = 0;
 };
 
 window.toggleChapter = function(chId) {
   expandedChapter = expandedChapter===chId ? null : chId;
   const sub = SUBJECTS.find(s=>s.chapters.some(c=>c.id===chId));
-  const pages = document.getElementById('pages');
-  pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
+  const content = document.getElementById('content');
+  const topbarSub = document.getElementById('topbar-sub');
+  content.innerHTML = renderSubject(sub);
+  topbarSub.textContent = `${sub.chapters.length} chapters · ${subStats(sub).pct}% complete`;
 };
 
 window.toggleLec = function(subId, chId, lecId) {
-  const nowTicking = !watched[lecId];
-  watched[lecId] = nowTicking;
-  if(nowTicking) {
-    timestamps[lecId] = new Date().toISOString();
-  } else {
-    delete timestamps[lecId];
-  }
+  watched[lecId] = !watched[lecId];
+  if(watched[lecId]) { timestamps[lecId] = new Date().toISOString(); }
+  else { delete timestamps[lecId]; }
   save();
   const sub = SUBJECTS.find(s=>s.id===subId);
-  const pages = document.getElementById('pages');
-  pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
+  const content = document.getElementById('content');
+  content.innerHTML = renderSubject(sub);
   renderHeader();
+  renderSubjectNavBtns();
 };
 
 window.toggleStar = function(subId, chId, e) {
@@ -848,8 +1096,7 @@ window.toggleStar = function(subId, chId, e) {
   if(!starred[chId]) delete starred[chId];
   save();
   const sub = SUBJECTS.find(s=>s.id===subId);
-  const pages = document.getElementById('pages');
-  pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
+  document.getElementById('content').innerHTML = renderSubject(sub);
 };
 
 window.markAll = function(subId, chId, val) {
@@ -862,46 +1109,12 @@ window.markAll = function(subId, chId, val) {
     else { delete timestamps[l.id]; }
   });
   save();
-  const pages = document.getElementById('pages');
-  pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
+  document.getElementById('content').innerHTML = renderSubject(sub);
   renderHeader();
+  renderSubjectNavBtns();
 };
-// --- Swipe Navigation ---
-let touchstartX = 0;
-let touchendX = 0;
-const swipeThreshold = 50; 
 
-document.addEventListener('touchstart', e => {
-  touchstartX = e.changedTouches[0].screenX;
-}, { passive: true });
-
-document.addEventListener('touchend', e => {
-  touchendX = e.changedTouches[0].screenX;
-  handleSwipe();
-}, { passive: true });
-
-function handleSwipe() {
-  const distance = touchendX - touchstartX;
-  
-  // Rebuild the exact order of your tabs
-  const tabOrder = ['daily', 'overview', ...SUBJECTS.map(s => s.id)];
-  const currentIndex = tabOrder.indexOf(currentTab);
-
-  // Swiped Left (Finger moved left) -> Next Tab
-  if (distance < -swipeThreshold) {
-    if (currentIndex < tabOrder.length - 1) {
-      switchTab(tabOrder[currentIndex + 1]);
-    }
-  } 
-  // Swiped Right (Finger moved right) -> Previous Tab
-  else if (distance > swipeThreshold) {
-    if (currentIndex > 0) {
-      switchTab(tabOrder[currentIndex - 1]);
-    }
-  }
-}
-
-// --- Settings modal ---
+// --- Settings ---
 window.openSettings = function() {
   document.getElementById('settings-overlay').style.display = 'block';
   document.getElementById('settings-modal').style.display = 'block';
@@ -913,39 +1126,18 @@ window.closeSettings = function() {
 };
 
 window.exportData = function() {
-  const data = {
-    version: 2,
-    exportedAt: new Date().toISOString(),
-    watched,
-    timestamps,
-    starred,
-    subjects: SUBJECTS
-  };
+  const data = { version:2, exportedAt:new Date().toISOString(), watched, timestamps, starred, subjects:SUBJECTS };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `ca-tracker-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
+  const a = document.createElement('a'); a.href=url; a.download=`ca-tracker-backup-${new Date().toISOString().slice(0,10)}.json`; a.click();
   URL.revokeObjectURL(url);
 };
 
 window.exportCourseJSON = function() {
-  const structure = {
-    version: 2,
-    exportedAt: new Date().toISOString(),
-    note: "Edit lecture 'mins' values or add/remove lectures, then re-import as a full backup.",
-    watched,
-    timestamps,
-    starred,
-    subjects: SUBJECTS
-  };
+  const structure = { version:2, exportedAt:new Date().toISOString(), note:"Edit lecture 'mins' values or add/remove lectures, then re-import.", watched, timestamps, starred, subjects:SUBJECTS };
   const blob = new Blob([JSON.stringify(structure, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `ca-tracker-course-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
+  const a = document.createElement('a'); a.href=url; a.download=`ca-tracker-course-${new Date().toISOString().slice(0,10)}.json`; a.click();
   URL.revokeObjectURL(url);
 };
 
@@ -957,13 +1149,9 @@ window.importData = function(e) {
     try {
       const data = JSON.parse(ev.target.result);
       const msg = document.getElementById('import-msg');
-
-      // Restore watched, timestamps, starred
       if(data.watched) watched = data.watched;
       if(data.timestamps) timestamps = data.timestamps;
       if(data.starred) starred = data.starred;
-
-      // If subjects are included, patch SUBJECTS in place
       if(data.subjects && Array.isArray(data.subjects)) {
         data.subjects.forEach(importedSub => {
           const sub = SUBJECTS.find(s => s.id === importedSub.id);
@@ -971,42 +1159,30 @@ window.importData = function(e) {
             importedSub.chapters.forEach(importedCh => {
               const ch = sub.chapters.find(c => c.id === importedCh.id);
               if(ch) {
-                // Update existing lecture mins
                 importedCh.lectures.forEach(importedLec => {
                   const lec = ch.lectures.find(l => l.id === importedLec.id);
                   if(lec) { lec.mins = importedLec.mins; }
-                  else {
-                    // New lecture — add it
-                    ch.lectures.push({id: importedLec.id, mins: importedLec.mins, done: false});
-                  }
+                  else { ch.lectures.push({id: importedLec.id, mins: importedLec.mins, done: false}); }
                 });
               }
             });
           }
         });
       }
-
-      save();
-      render();
-      msg.style.display = 'block';
-      msg.style.color = '#7EC8A8';
-      msg.textContent = '✓ Import successful! Data restored.';
-      e.target.value = '';
+      save(); render();
+      msg.style.display='block'; msg.style.color='#7EC8A8'; msg.textContent='✓ Import successful! Data restored.';
+      e.target.value='';
     } catch(err) {
       const msg = document.getElementById('import-msg');
-      msg.style.display = 'block';
-      msg.style.color = '#E87C7C';
-      msg.textContent = '✕ Invalid file. Please use a valid backup JSON.';
+      msg.style.display='block'; msg.style.color='#E87C7C'; msg.textContent='✕ Invalid file. Please use a valid backup JSON.';
     }
   };
   reader.readAsText(file);
 };
 
-// --- Theme toggle ---
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
-  const btn = document.getElementById('theme-toggle');
-  btn.textContent = isLight ? '🌙 Dark' : '☀️ Light';
+  document.getElementById('theme-toggle').textContent = isLight ? '🌙 Dark' : '☀️ Light';
   try { localStorage.setItem('ca_theme', isLight ? 'light' : 'dark'); } catch{}
 }
 function initTheme() {
@@ -1020,48 +1196,44 @@ function initTheme() {
   } catch{}
 }
 
-// --- Boot ---
 initState();
 initTheme();
 render();
 </script>
-<!-- Settings Modal -->
-<div id="settings-overlay" onclick="closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(3px);"></div>
-<div id="settings-modal" style="display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:201;border-radius:22px 22px 0 0;padding:0 0 32px;">
+
+<div id="settings-overlay" onclick="closeSettings()"></div>
+<div id="settings-modal">
   <div id="settings-inner">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;">
-      <div style="font-size:16px;font-weight:800">⚙️ Settings</div>
-      <button onclick="closeSettings()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:28px;height:28px;font-size:14px;color:#aaa;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 14px;">
+      <div style="font-size:18px;font-weight:800">⚙️ Settings</div>
+      <button class="close-settings-btn" onclick="closeSettings()">✕</button>
     </div>
 
-    <!-- Export Section -->
-    <div style="padding:0 20px 16px;">
-      <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:10px;">Backup & Restore</div>
-      <div id="settings-card-1" style="border-radius:14px;padding:14px 16px;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📤 Export Data</div>
-        <div style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.5">Downloads a <code style="font-size:10px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px">.json</code> backup of your progress, stars, and timestamps. Keep it safe.</div>
-        <button onclick="exportData()" id="export-btn" style="width:100%;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;">📤 Export Backup</button>
+    <div style="padding:0 22px 18px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:12px;">Backup & Restore</div>
+      <div id="settings-card-1" style="border-radius:14px;padding:16px 18px;margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:5px;">📤 Export Data</div>
+        <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.5">Downloads a <code style="font-size:11px;background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px">.json</code> backup of your progress, stars, and timestamps.</div>
+        <button onclick="exportData()" id="export-btn" style="width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;">📤 Export Backup</button>
       </div>
-
-      <div id="settings-card-2" style="border-radius:14px;padding:14px 16px;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📥 Import Data</div>
-        <div style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.5">Restore from a backup file. This will <strong>overwrite</strong> your current progress.</div>
-        <label id="import-label" style="display:block;width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;box-sizing:border-box;">
+      <div id="settings-card-2" style="border-radius:14px;padding:16px 18px;margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:5px;">📥 Import Data</div>
+        <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.5">Restore from a backup file. This will <strong>overwrite</strong> your current progress.</div>
+        <label id="import-label" style="display:block;width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;box-sizing:border-box;">
           📥 Import Backup
           <input type="file" accept=".json" onchange="importData(event)" style="display:none;">
         </label>
-        <div id="import-msg" style="font-size:11px;margin-top:8px;text-align:center;display:none;"></div>
+        <div id="import-msg" style="font-size:12px;margin-top:10px;text-align:center;display:none;"></div>
       </div>
     </div>
 
-    <!-- Edit Section -->
-    <div style="padding:0 20px 16px;">
-      <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:10px;">Bulk Edit Lectures</div>
-      <div id="settings-card-3" style="border-radius:14px;padding:14px 16px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">✏️ Edit Course Data</div>
-        <div style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.5">Export the full course structure as JSON, edit lecture times or add lectures in any editor, then re-import. Changes apply instantly.</div>
-        <button onclick="exportCourseJSON()" style="width:100%;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">📋 Export Course Structure</button>
-        <div style="font-size:10px;color:#666;text-align:center;">Edit & re-import as backup to apply changes</div>
+    <div style="padding:0 22px 0;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:12px;">Bulk Edit Lectures</div>
+      <div id="settings-card-3" style="border-radius:14px;padding:16px 18px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:5px;">✏️ Edit Course Data</div>
+        <div style="font-size:12px;color:#888;margin-bottom:14px;line-height:1.5">Export the full course structure as JSON, edit lecture times, then re-import.</div>
+        <button onclick="exportCourseJSON()" style="width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">📋 Export Course Structure</button>
+        <div style="font-size:11px;color:#666;text-align:center;">Edit & re-import as backup to apply changes</div>
       </div>
     </div>
   </div>
