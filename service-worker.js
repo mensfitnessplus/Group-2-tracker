@@ -1,4 +1,4 @@
-const CACHE_NAME = "ca-tracker-v1.2";
+const CACHE_NAME = "ca-tracker-v1.3";
 
 const urlsToCache = [
   "./",
