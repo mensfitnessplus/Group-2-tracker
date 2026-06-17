@@ -49,35 +49,42 @@
   .day-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
   .lec-date{font-size:9px;color:#555;margin-top:1px;}
 
-  /* ── LIGHT MODE ── */
-  body.light{background:#F0EEE9;color:#1E1B16;}
-  body.light #header{background:linear-gradient(135deg,#E8E2D9,#EDE8E0);border-bottom:1px solid rgba(0,0,0,.07);}
-  body.light #header-label{color:#A09880;}
-  body.light #header-remaining{color:#1E1B16;}
-  body.light #header-sub{color:#9A8F80;}
-  body.light #global-bar-wrap{background:rgba(0,0,0,.08);}
-  body.light #header-pct{color:#B0A898;}
-  body.light #tabs{background:#EAE5DC;border-bottom:1px solid rgba(0,0,0,.07);}
-  body.light .tab-btn{color:#B0A898;}
-  body.light #stats-strip{background:#EAE5DC;border-bottom:1px solid rgba(0,0,0,.07);}
-  body.light .stat-pill{border-right:1px solid rgba(0,0,0,.07);}
-  body.light .stat-val{color:#1E1B16;}
-  body.light .stat-lbl{color:#A09880;}
-  body.light .card{background:#F7F4EF;border:1px solid rgba(0,0,0,.07);}
-  body.light .card.done{background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2);}
-  body.light .chapter-card{background:#F7F4EF;border:1px solid rgba(0,0,0,.07);}
-  body.light .chapter-card.done{background:rgba(62,160,100,.06);border-color:rgba(62,160,100,.2);}
-  body.light .chapter-body{border-top:1px solid rgba(0,0,0,.06);}
-  body.light .chapter-arrow{color:#C0B8AA;}
-  body.light .bar-wrap{background:rgba(0,0,0,.07);}
-  body.light .lec-row{border-bottom:1px solid rgba(0,0,0,.05);}
-  body.light .day-row{border-bottom:1px solid rgba(0,0,0,.05);}
-  body.light .day-label{color:#4A3F30;}
-  body.light .day-bar-wrap{background:rgba(0,0,0,.07);}
-  body.light .lec-date{color:#B0A898;}
-  body.light .ch-time{color:#A09880;}
-  body.light .chapter-card.starred{background:#FFFBEB;border-color:rgba(245,200,66,.3);}
-  body.light .chapter-card.starred .ch-name{color:#5A4800;}
+  /* ── HEATMAP THEME (Pure White Background) ── */
+  body.heatmap { background: #ffffff !important; color: #1E1B16 !important; }
+  body.heatmap #header { background: linear-gradient(135deg, #F5F5F5, #FFFFFF) !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; }
+  body.heatmap #header-label { color: #707070 !important; }
+  body.heatmap #header-remaining { color: #1E1B16 !important; }
+  body.heatmap #header-sub { color: #707070 !important; }
+  body.heatmap #global-bar-wrap { background: rgba(0,0,0,.08) !important; }
+  body.heatmap #header-pct { color: #888888 !important; }
+  body.heatmap #tabs { background: #F5F5F5 !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; }
+  body.heatmap .tab-btn { color: #888888 !important; }
+  body.heatmap #stats-strip { background: #F5F5F5 !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; }
+  body.heatmap .stat-pill { border-right: 1px solid rgba(0,0,0,.08) !important; }
+  body.heatmap .stat-val { color: #1E1B16 !important; }
+  body.heatmap .stat-lbl { color: #707070 !important; }
+  body.heatmap .card { background: #FAFAFA !important; border: 1px solid rgba(0,0,0,.08) !important; }
+  body.heatmap .card.done { background: rgba(62,160,100,.06) !important; border-color: rgba(62,160,100,.2) !important; }
+  body.heatmap .chapter-card { background: var(--heatmap-bg, #ffffff) !important; border: 1px solid rgba(220, 50, 50, 0.15) !important; }
+  body.heatmap .chapter-card.done { border-left: 4px solid #3EA064 !important; background: rgba(62,160,100,.06) !important; opacity: 0.85; }
+  body.heatmap .chapter-card.starred { border: 2px dashed rgba(245,200,66,.8) !important; }
+  body.heatmap .chapter-body { border-top: 1px solid rgba(0,0,0,.06) !important; }
+  body.heatmap .chapter-arrow { color: #C0B8AA !important; }
+  body.heatmap .bar-wrap { background: rgba(0,0,0,.07) !important; }
+  body.heatmap .lec-row { border-bottom: 1px solid rgba(0,0,0,.05) !important; }
+  body.heatmap .day-row { border-bottom: 1px solid rgba(0,0,0,.05) !important; }
+  body.heatmap .day-label { color: #4A3F30 !important; }
+  body.heatmap .day-bar-wrap { background: rgba(0,0,0,.07) !important; }
+  body.heatmap .lec-date { color: #B0A898 !important; }
+  body.heatmap .ch-time { color: #A09880 !important; }
+  body.heatmap #theme-toggle { background: rgba(0,0,0,.07) !important; border-color: rgba(0,0,0,.12) !important; color: #555 !important; }
+  body.heatmap #settings-btn { background: rgba(0,0,0,.07) !important; border-color: rgba(0,0,0,.12) !important; }
+  body.heatmap #settings-inner { background: #ffffff !important; border-color: rgba(0,0,0,.08) !important; }
+  body.heatmap #settings-card-1, body.heatmap #settings-card-2, body.heatmap #settings-card-3 { background: rgba(0,0,0,.04) !important; border-color: rgba(0,0,0,.07) !important; }
+  body.heatmap #export-btn { color: #fff !important; }
+  body.heatmap #import-label { background: rgba(62,140,168,.1) !important; border-color: rgba(62,140,168,.3) !important; color: #3A8BA8 !important; }
+  body.heatmap #settings-modal button:not(#settings-btn):not(#export-btn) { background: rgba(196,119,65,.1) !important; border-color: rgba(196,119,65,.3) !important; color: #C47741 !important; }
+  body.heatmap .diff-dots { display: none !important; }
 
   .chapter-card.starred{border-color:rgba(245,200,66,.3);background:rgba(255,210,50,.03);}
 
@@ -120,11 +127,6 @@
     white-space:nowrap;
     margin-top:2px;
   }
-  body.light #theme-toggle{
-    background:rgba(0,0,0,.07);
-    border-color:rgba(0,0,0,.12);
-    color:#7A6F60;
-  }
 
   /* ── SETTINGS BUTTON ── */
   #settings-btn{
@@ -135,10 +137,6 @@
     font-size:13px;
     transition:all .25s;
   }
-  body.light #settings-btn{
-    background:rgba(0,0,0,.07);
-    border-color:rgba(0,0,0,.12);
-  }
 
   /* ── SETTINGS MODAL ── */
   #settings-inner{
@@ -147,14 +145,9 @@
     border:1px solid rgba(255,255,255,.08);
     border-bottom:none;
   }
-  body.light #settings-inner{background:#F0EEE9;border-color:rgba(0,0,0,.08);}
   #settings-card-1,#settings-card-2,#settings-card-3{
     background:rgba(255,255,255,.04);
     border:1px solid rgba(255,255,255,.07);
-  }
-  body.light #settings-card-1,body.light #settings-card-2,body.light #settings-card-3{
-    background:rgba(0,0,0,.04);
-    border-color:rgba(0,0,0,.07);
   }
   #export-btn{
     background:linear-gradient(135deg,#7EC8A8,#5aaa88);
@@ -165,33 +158,10 @@
     border:1px dashed rgba(126,184,200,.4);
     color:#7EB8C8;
   }
-  body.light #export-btn{color:#fff;}
-  body.light #import-label{background:rgba(62,140,168,.1);border-color:rgba(62,140,168,.3);color:#3A8BA8;}
   #settings-modal button:not(#settings-btn):not(#export-btn){
     background:rgba(232,168,124,.15);
     border:1px solid rgba(232,168,124,.3);
     color:#E8A87C;
-  }
-  body.light #settings-modal button:not(#settings-btn):not(#export-btn){
-    background:rgba(196,119,65,.1);
-    border-color:rgba(196,119,65,.3);
-    color:#C47741;
-  }
-
-  /* ── HEATMAP THEME (Builds on Light mode) ── */
-  body.heatmap .chapter-card {
-    background: var(--heatmap-bg, #ffffff) !important;
-    border: 1px solid rgba(220, 50, 50, 0.15) !important;
-  }
-  body.heatmap .chapter-card.done {
-    border-left: 4px solid #3EA064 !important;
-    opacity: 0.85;
-  }
-  body.heatmap .chapter-card.starred {
-    border: 2px dashed rgba(245,200,66,.8) !important;
-  }
-  body.heatmap .diff-dots {
-    display: none !important;
   }
 </style>
 </head>
@@ -207,7 +177,7 @@
       <div id="header-remaining">—</div>
       <div id="header-sub">remaining</div>
       <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:2px">
-        <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+        <button id="theme-toggle" onclick="toggleTheme()">🔥 Heatmap</button>
         <button id="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
       </div>
     </div>
@@ -346,7 +316,7 @@ const SUBJECTS = [
         {id:"audit_c7_l1",mins:D(.06607638888888889),done:false},
         {id:"audit_c7_l2",mins:D(.05800925925925926),done:false},
         {id:"audit_c7_l3",mins:D(.03650462962962963),done:false},
-        {id:"audit_c7_l4",mins:D(.05319444444444445),done:false}]},
+        {id:"audit_c7_l4",mins:D(.03319444444444445),done:false}]},
       { id:"audit_c8", name:"8. Audit Documentation", lectures:[
         {id:"audit_c8_l1",mins:D(.05269675925925926),done:false}]},
       { id:"audit_c9", name:"9. Completion and Review", lectures:[
@@ -522,15 +492,12 @@ function daysLeft(remainingMins) {
   const remainingHours = remainingMins / 60;
   return Math.ceil(remainingHours / HOURS_PER_DAY);
 }
-// Time until remaining hours crosses the next whole "day" boundary
-// i.e. how much more do I need to watch before days drops by 1
 function timeToNextDayDrop(remainingMins) {
   const remainingHours = remainingMins / 60;
   const currentDays = Math.ceil(remainingHours / HOURS_PER_DAY);
-  // next lower day threshold: (currentDays - 1) * 6 hours
   const nextThresholdHours = (currentDays - 1) * HOURS_PER_DAY;
   const minsToGo = (remainingHours - nextThresholdHours) * 60;
-  return minsToGo; // in minutes
+  return minsToGo;
 }
 function fmtCountdown(mins) {
   if(mins <= 0) return '0:00:00';
@@ -543,7 +510,7 @@ function fmtCountdown(mins) {
 
 // --- Feature 4: Daily hours tracker ---
 function getDailyLog() {
-  const log = {}; // "YYYY-MM-DD" -> total mins (only studied days)
+  const log = {};
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
     if(watched[lec.id] && timestamps[lec.id]) {
       const d = timestamps[lec.id].slice(0,10);
@@ -553,20 +520,17 @@ function getDailyLog() {
   return log;
 }
 
-// Returns a full log from first tick to today, filling 0 for missed days
 function getFullDailyLog() {
   const sparse = getDailyLog();
   const studiedDays = Object.keys(sparse).sort();
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  // Always include today even if nothing studied yet
   if(studiedDays.length === 0) return {[today]: 0};
   const firstDay = studiedDays[0] < today ? studiedDays[0] : today;
   const full = {};
   let cur = new Date(firstDay + 'T00:00:00');
   const endMs = new Date(today + 'T00:00:00').getTime();
   while(cur.getTime() <= endMs) {
-    // Use local date parts — never toISOString() which shifts to UTC
     const key = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
     full[key] = sparse[key] || 0;
     cur.setDate(cur.getDate() + 1);
@@ -574,18 +538,16 @@ function getFullDailyLog() {
   return full;
 }
 
-// Get Monday of the week containing a given YYYY-MM-DD string
 function getMondayOf(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
-  const day = d.getDay(); // 0=Sun,1=Mon,...
+  const day = d.getDay();
   const diff = (day === 0) ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
   return d.toISOString().slice(0,10);
 }
 
-// Group full log into weeks (keyed by Monday date)
 function groupByWeek(fullLog) {
-  const weeks = {}; // mondayStr -> {days: {dateStr: mins}}
+  const weeks = {};
   Object.keys(fullLog).forEach(d => {
     const mon = getMondayOf(d);
     if(!weeks[mon]) weeks[mon] = {};
@@ -600,14 +562,13 @@ function fmtTime(mins) {
   return h > 0 && m > 0 ? `${h}h ${m}m` : h > 0 ? `${h}h` : `${m}m`;
 }
 
-function weekStatsHTML(weekDays, isLight, isCurrent) {
+function weekStatsHTML(weekDays, isHeatmap, isCurrent) {
   const vals = Object.values(weekDays);
   const maxV = Math.max(...vals);
   const minV = Math.min(...vals);
   const avgV = vals.reduce((a,b)=>a+b,0) / vals.length;
   const totalV = vals.reduce((a,b)=>a+b,0);
 
-  // trend arrow vs previous week not available here, handled outside
   const stats = [
     {label:'MIN', val:minV, color:'#7EB8C8'},
     {label:'AVG', val:avgV, color:'#E8A87C'},
@@ -616,7 +577,7 @@ function weekStatsHTML(weekDays, isLight, isCurrent) {
   ];
   return `<div style="display:flex;gap:6px;">
     ${stats.map(({label,val,color}) => `
-      <div style="flex:1;background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:10px;padding:8px 4px;text-align:center;">
+      <div style="flex:1;background:${isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:10px;padding:8px 4px;text-align:center;">
         <div style="font-size:8px;font-weight:700;letter-spacing:.8px;color:#666;text-transform:uppercase;margin-bottom:3px;">${label}</div>
         <div style="font-size:13px;font-weight:800;color:${color};">${fmtTime(val)}</div>
       </div>`).join('')}
@@ -626,7 +587,7 @@ function weekStatsHTML(weekDays, isLight, isCurrent) {
 let weekHistoryOpen = {};
 
 function renderDailyTracker() {
-  const isLight = document.body.classList.contains('light');
+  const isHeatmap = document.body.classList.contains('heatmap');
   const fullLog = getFullDailyLog();
   const allDays = Object.keys(fullLog).sort().reverse();
 
@@ -638,7 +599,7 @@ function renderDailyTracker() {
   const todayBarColor = todayMins === 0 ? 'rgba(126,200,168,.3)' : todayMins >= hoursGoal ? '#7EC8A8' : todayMins >= hoursGoal * 0.5 ? '#E8A87C' : '#7EB8C8';
   const todayLabel = todayNow.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
 
-  const todayCard = `<div style="background:${isLight?'rgba(126,200,168,.08)':'rgba(126,200,168,.07)'};border:1.5px solid rgba(126,200,168,.3);border-radius:16px;padding:16px 18px;margin-bottom:16px;">
+  const todayCard = `<div style="background:${isHeatmap?'rgba(62,160,100,.08)':'rgba(126,200,168,.07)'};border:1.5px solid rgba(126,200,168,.3);border-radius:16px;padding:16px 18px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
       <div>
         <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:#7EC8A8;text-transform:uppercase;margin-bottom:3px;">Today</div>
@@ -649,7 +610,7 @@ function renderDailyTracker() {
         <div style="font-size:10px;color:#555;">${todayMins === 0 ? 'Nothing yet' : `${todayPct}% of ${HOURS_PER_DAY}h goal`}</div>
       </div>
     </div>
-    <div style="height:7px;background:${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;margin-top:10px;">
+    <div style="height:7px;background:${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;margin-top:10px;">
       <div style="height:100%;width:${todayPct}%;background:${todayBarColor};border-radius:4px;transition:width .4s ease;"></div>
     </div>
   </div>`;
@@ -658,12 +619,12 @@ function renderDailyTracker() {
 
   const weeks = groupByWeek(fullLog);
   const todayMon = getMondayOf(todayStr);
-  const sortedWeeks = Object.keys(weeks).sort().reverse(); // newest first
+  const sortedWeeks = Object.keys(weeks).sort().reverse();
 
   let html = todayCard;
 
   sortedWeeks.forEach((mon, wi) => {
-    const weekDays = weeks[mon]; // {dateStr: mins}
+    const weekDays = weeks[mon];
     const isCurrent = mon === todayMon;
     const weekDaysSorted = Object.keys(weekDays).sort().reverse();
     const sunDate = new Date(mon + 'T00:00:00');
@@ -672,7 +633,6 @@ function renderDailyTracker() {
     const sunLabel = sunDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
     const weekLabel = `${monLabel} – ${sunLabel}`;
 
-    // Day cards for this week
     const dayCards = weekDaysSorted.filter(d => d !== todayStr).map(d => {
       const mins = weekDays[d];
       const timeStr = mins === 0 ? '—' : fmtTime(mins);
@@ -683,19 +643,18 @@ function renderDailyTracker() {
       const label = dateObj.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
       const todayLocal = new Date();
       const isToday = d === `${todayLocal.getFullYear()}-${String(todayLocal.getMonth()+1).padStart(2,'0')}-${String(todayLocal.getDate()).padStart(2,'0')}`;
-      return `<div style="background:${mins===0?(isLight?'rgba(0,0,0,.02)':'rgba(255,255,255,.02)'):(isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)')};border:1px solid ${mins===0?(isLight?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'):(isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)')};border-radius:14px;padding:14px 16px;margin-bottom:8px;${isToday?'border-color:rgba(126,200,168,.35);':''}" >
+      return `<div style="background:${mins===0?(isHeatmap?'rgba(0,0,0,.02)':'rgba(255,255,255,.02)'):(isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)')};border:1px solid ${mins===0?(isHeatmap?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'):(isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)')};border-radius:14px;padding:14px 16px;margin-bottom:8px;${isToday?'border-color:rgba(126,200,168,.35);':''}" >
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${mins>0?'10px':'0'};">
           <div style="font-size:13px;font-weight:700;color:${mins===0?'#555':'#ccc'}">${label}${isToday?' <span style="font-size:9px;background:rgba(126,200,168,.15);color:#7EC8A8;padding:1px 6px;border-radius:8px;font-weight:700;">TODAY</span>':''}</div>
           <div style="font-size:15px;font-weight:800;color:${textColor}">${timeStr}</div>
         </div>
-        ${mins > 0 ? `<div style="height:6px;background:${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;">
+        ${mins > 0 ? `<div style="height:6px;background:${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;">
           <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width .4s ease;"></div>
         </div>
         <div style="font-size:10px;color:#555;margin-top:5px;text-align:right">${pct}% of ${HOURS_PER_DAY}h goal</div>` : ''}
       </div>`;
     }).join('');
 
-    // Trend vs previous week
     let trendHTML = '';
     if(wi < sortedWeeks.length - 1) {
       const prevMon = sortedWeeks[wi + 1];
@@ -710,27 +669,25 @@ function renderDailyTracker() {
     }
 
     if(isCurrent) {
-      // Current week: always expanded, stats shown at bottom
       html += `<div style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;margin-bottom:10px;">
           <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#7EC8A8;text-transform:uppercase;">This Week · ${weekLabel}</div>
           ${trendHTML}
         </div>
         ${dayCards}
-        <div style="margin-top:8px;">${weekStatsHTML(weekDays, isLight, true)}</div>
+        <div style="margin-top:8px;">${weekStatsHTML(weekDays, isHeatmap, true)}</div>
       </div>`;
     } else {
-      // Past week: collapsible
       const isOpen = !!weekHistoryOpen[mon];
       html += `<div style="margin-bottom:10px;">
-        <button onclick="toggleWeekHistory('${mon}')" style="width:100%;background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:inherit;">
+        <button onclick="toggleWeekHistory('${mon}')" style="width:100%;background:${isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:inherit;">
           <div>
             <div style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#888;text-transform:uppercase;text-align:left;">Week · ${weekLabel}</div>
             ${trendHTML}
           </div>
           <span style="font-size:16px;color:#555;transition:transform .2s;${isOpen?'transform:rotate(90deg)':''}">›</span>
         </button>
-        ${isOpen ? `<div style="margin-top:8px;">${dayCards}<div style="margin-top:8px;">${weekStatsHTML(weekDays, isLight, false)}</div></div>` : ''}
+        ${isOpen ? `<div style="margin-top:8px;">${dayCards}<div style="margin-top:8px;">${weekStatsHTML(weekDays, isHeatmap, false)}</div></div>` : ''}
       </div>`;
     }
   });
@@ -776,19 +733,15 @@ function renderHeader() {
   document.getElementById('global-bar').style.width = g.pct+'%';
   document.getElementById('header-pct').textContent = `${g.pct}% watched · ${fmtMins(g.done)} done`;
 
-  // Feature 1: chapter counter
   const ch = chapterStats();
   document.getElementById('stat-chapters').textContent = `${ch.done}/${ch.total}`;
 
-  // Feature 2: days left
   const days = daysLeft(g.remaining);
   document.getElementById('stat-days').textContent = days > 0 ? `${days}d` : '🎉 Done';
 
-  // Feature 3: countdown to next day drop
   const mins = timeToNextDayDrop(g.remaining);
   document.getElementById('stat-countdown').textContent = fmtCountdown(mins) + ' to go';
 
-  // Feature 5: syllabus completion date
   const compEl = document.getElementById('stat-completion');
   if(days <= 0) {
     compEl.textContent = '🎉 Done!';
@@ -817,7 +770,6 @@ function renderTabs() {
 function renderOverview() {
   const g = globalStats();
 
-  // Build starred list
   const starredList = [];
   SUBJECTS.forEach(sub => sub.chapters.forEach(ch => {
     if(starred[ch.id]) starredList.push({sub, ch});
@@ -894,7 +846,6 @@ function renderSubject(sub) {
     </div>
   </div>`;
 
-  // compute difficulty dots: rank chapters by total mins within this subject
   const chTotals = sub.chapters.map(c => c.lectures.reduce((s,l)=>s+l.mins,0));
   const minTotal = Math.min(...chTotals);
   const maxTotal = Math.max(...chTotals);
@@ -904,7 +855,6 @@ function renderSubject(sub) {
     const isOpen = expandedChapter === ch.id;
     const lecCount = ch.lectures.length;
 
-    // difficulty: 1–5 dots based on total duration relative to subject min/max
     const chTotal = chTotals[idx];
     let dots;
     let norm = 0;
@@ -921,7 +871,6 @@ function renderSubject(sub) {
     ).join('') + `</span>`;
 
     const isStarred = !!starred[ch.id];
-    // Create a linear gradient over pure white to mix the semi-transparent red properly on all browsers
     const heatmapBg = `linear-gradient(rgba(220,50,50,${norm * 0.45}), rgba(220,50,50,${norm * 0.45})), #ffffff`;
 
     html += `<div class="chapter-card${cs.allDone?' done':''}${isStarred?' starred':''}" id="chcard_${ch.id}" style="--heatmap-bg: ${heatmapBg};">
@@ -1026,7 +975,6 @@ function celebrateChapter(chName, doneChs, totalChs) {
   el.id = 'chapter-celebrate';
   el.style.cssText = 'position:fixed;inset:0;z-index:500;overflow:hidden;';
 
-  // Confetti particles
   const colors = ['#7EC8A8','#E8A87C','#7EB8C8','#A07EC8','#F5C842','#E87C7C'];
   const particles = Array.from({length:60}, (_,i) => {
     const color = colors[i % colors.length];
@@ -1056,23 +1004,7 @@ function celebrateChapter(chName, doneChs, totalChs) {
         80%  { transform:translateX(-50%) scale(.97); }
         100% { transform:translateX(-50%) scale(1);   opacity:1; }
       }
-    
-  /* ── HEATMAP THEME (Builds on Light mode) ── */
-  body.heatmap .chapter-card {
-    background: var(--heatmap-bg, #ffffff) !important;
-    border: 1px solid rgba(220, 50, 50, 0.15) !important;
-  }
-  body.heatmap .chapter-card.done {
-    border-left: 4px solid #3EA064 !important;
-    opacity: 0.85;
-  }
-  body.heatmap .chapter-card.starred {
-    border: 2px dashed rgba(245,200,66,.8) !important;
-  }
-  body.heatmap .diff-dots {
-    display: none !important;
-  }
-</style>
+    </style>
     ${particles}
     <div style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1D28,#222638);border:1.5px solid rgba(126,200,168,.45);border-radius:20px;padding:20px 24px;text-align:center;min-width:270px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:celebrate-pop .5s cubic-bezier(.34,1.56,.64,1) forwards;">
       <div style="font-size:28px;margin-bottom:8px;">🎉</div>
@@ -1098,7 +1030,6 @@ window.toggleLec = function(subId, chId, lecId) {
   }
   save();
   const sub = SUBJECTS.find(s=>s.id===subId);
-  // Check if this tick just completed the chapter
   if(nowTicking) {
     const ch = sub.chapters.find(c=>c.id===chId);
     const cs = chStats(ch);
@@ -1114,12 +1045,10 @@ window.toggleLec = function(subId, chId, lecId) {
 
 window.editLecDate = function(lecId, e) {
   e.stopPropagation();
-  // Get current date value for the input default
   const _ed = new Date();
   const _edToday = `${_ed.getFullYear()}-${String(_ed.getMonth()+1).padStart(2,'0')}-${String(_ed.getDate()).padStart(2,'0')}`;
   const current = timestamps[lecId] ? timestamps[lecId].slice(0,10) : _edToday;
 
-  // Remove any existing picker
   const existing = document.getElementById('date-edit-overlay');
   if(existing) existing.remove();
 
@@ -1127,16 +1056,16 @@ window.editLecDate = function(lecId, e) {
   overlay.id = 'date-edit-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);';
 
-  const isLight = document.body.classList.contains('light');
+  const isHeatmap = document.body.classList.contains('heatmap');
   overlay.innerHTML = `
-    <div style="background:${isLight?'#F0EEE9':'#1A1D28'};border-radius:22px 22px 0 0;border:1px solid ${isLight?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)'};border-bottom:none;width:100%;max-width:480px;padding:24px 24px 40px;">
+    <div style="background:${isHeatmap?'#ffffff':'#1A1D28'};border-radius:22px 22px 0 0;border:1px solid ${isHeatmap?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)'};width:100%;max-width:480px;padding:24px 24px 40px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-size:15px;font-weight:800;">📅 Edit Study Date</div>
+        <div style="font-size:15px;font-weight:800;color:${isHeatmap?'#1E1B16':'#E8EAF0'};">📅 Edit Study Date</div>
         <button onclick="document.getElementById('date-edit-overlay').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:28px;height:28px;font-size:14px;color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
       <div style="font-size:11px;color:#888;margin-bottom:14px;line-height:1.5;">Change the date this lecture was actually studied. The daily log will update automatically.</div>
       <input type="date" id="date-edit-input" value="${current}" max="${_edToday}"
-        style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid ${isLight?'rgba(0,0,0,.15)':'rgba(255,255,255,.15)'};background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.06)'};color:${isLight?'#1E1B16':'#E8EAF0'};font-size:15px;font-family:inherit;box-sizing:border-box;margin-bottom:14px;outline:none;">
+        style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid ${isHeatmap?'rgba(0,0,0,.15)':'rgba(255,255,255,.15)'};background:${isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.06)'};color:${isHeatmap?'#1E1B16':'#E8EAF0'};font-size:15px;font-family:inherit;box-sizing:border-box;margin-bottom:14px;outline:none;">
       <button onclick="(function(){
         const val = document.getElementById('date-edit-input').value;
         if(!val) return;
@@ -1192,7 +1121,6 @@ window.markAll = function(subId, chId, val) {
     }
   });
   save();
-  // Celebrate if marking all done and chapter is now complete
   if(val) {
     const cs = chStats(ch);
     if(cs.allDone) {
@@ -1204,6 +1132,7 @@ window.markAll = function(subId, chId, val) {
   pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
   renderHeader();
 };
+
 // --- Swipe Navigation ---
 let touchstartX = 0;
 let touchendX = 0;
@@ -1220,18 +1149,14 @@ document.addEventListener('touchend', e => {
 
 function handleSwipe() {
   const distance = touchendX - touchstartX;
-  
-  // Rebuild the exact order of your tabs
   const tabOrder = ['daily', 'overview', ...SUBJECTS.map(s => s.id)];
   const currentIndex = tabOrder.indexOf(currentTab);
 
-  // Swiped Left (Finger moved left) -> Next Tab
   if (distance < -swipeThreshold) {
     if (currentIndex < tabOrder.length - 1) {
       switchTab(tabOrder[currentIndex + 1]);
     }
   } 
-  // Swiped Right (Finger moved right) -> Previous Tab
   else if (distance > swipeThreshold) {
     if (currentIndex > 0) {
       switchTab(tabOrder[currentIndex - 1]);
@@ -1300,12 +1225,10 @@ window.importData = function(e) {
       const data = JSON.parse(ev.target.result);
       const msg = document.getElementById('import-msg');
 
-      // Restore watched, timestamps, starred
       if(data.watched) watched = data.watched;
       if(data.timestamps) timestamps = data.timestamps;
       if(data.starred) starred = data.starred;
 
-      // If subjects are included, patch SUBJECTS in place
       if(data.subjects && Array.isArray(data.subjects)) {
         data.subjects.forEach(importedSub => {
           const sub = SUBJECTS.find(s => s.id === importedSub.id);
@@ -1313,12 +1236,10 @@ window.importData = function(e) {
             importedSub.chapters.forEach(importedCh => {
               const ch = sub.chapters.find(c => c.id === importedCh.id);
               if(ch) {
-                // Update existing lecture mins
                 importedCh.lectures.forEach(importedLec => {
                   const lec = ch.lectures.find(l => l.id === importedLec.id);
                   if(lec) { lec.mins = importedLec.mins; }
                   else {
-                    // New lecture — add it
                     ch.lectures.push({id: importedLec.id, mins: importedLec.mins, done: false});
                   }
                 });
@@ -1348,21 +1269,29 @@ window.importData = function(e) {
 let currentTheme = 'dark';
 
 function applyTheme(theme) {
-  document.body.classList.remove('light', 'heatmap');
-  if (theme === 'light') document.body.classList.add('light');
-  if (theme === 'heatmap') document.body.classList.add('light', 'heatmap');
+  document.body.classList.remove('heatmap');
+  let themeColor = '#0F1117';
+  
+  if (theme === 'heatmap') {
+    document.body.classList.add('heatmap');
+    themeColor = '#ffffff';
+  }
+
+  // Dynamically change notification / system status bar color
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', themeColor);
+  }
 
   const btn = document.getElementById('theme-toggle');
   if (btn) {
-    if (theme === 'dark') btn.textContent = '☀️ Light';
-    else if (theme === 'light') btn.textContent = '🔥 Heatmap';
+    if (theme === 'dark') btn.textContent = '🔥 Heatmap';
     else btn.textContent = '🌙 Dark';
   }
 }
 
 function toggleTheme() {
-  if (currentTheme === 'dark') currentTheme = 'light';
-  else if (currentTheme === 'light') currentTheme = 'heatmap';
+  if (currentTheme === 'dark') currentTheme = 'heatmap';
   else currentTheme = 'dark';
 
   applyTheme(currentTheme);
@@ -1372,8 +1301,10 @@ function toggleTheme() {
 function initTheme() {
   try {
     const saved = localStorage.getItem('ca_theme');
-    if (saved === 'light' || saved === 'heatmap' || saved === 'dark') {
+    if (saved === 'heatmap' || saved === 'dark') {
       currentTheme = saved;
+    } else {
+      currentTheme = 'dark';
     }
   } catch{}
   applyTheme(currentTheme);
@@ -1387,7 +1318,6 @@ const BackupFolderEngine = (() => {
   const IDB_KEY_HISTORY = 'backupHistory';
   const MAX_HISTORY     = 20;
 
-  // ── IndexedDB helpers (reuse existing DB "ca-tracker" store "settings") ──
   function idbGet(key) {
     return new Promise((res, rej) => {
       const req = indexedDB.open('ca-tracker', 1);
@@ -1395,7 +1325,6 @@ const BackupFolderEngine = (() => {
       req.onerror  = () => rej(req.error);
       req.onsuccess = e => {
         const db  = e.target.result;
-        // Make sure the store exists; if not, resolve null
         if (!db.objectStoreNames.contains('settings')) { db.close(); return res(null); }
         const tx  = db.transaction('settings', 'readonly');
         const get = tx.objectStore('settings').get(key);
@@ -1413,8 +1342,6 @@ const BackupFolderEngine = (() => {
       req.onsuccess = e => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains('settings')) {
-          db.close();
-          // Create the store via version bump
           db.close();
           const req2 = indexedDB.open('ca-tracker', db.version + 1);
           req2.onupgradeneeded = ev => ev.target.result.createObjectStore('settings');
@@ -1435,11 +1362,9 @@ const BackupFolderEngine = (() => {
     });
   }
 
-  // ── State ──
-  let _handle  = null;   // FileSystemDirectoryHandle | null
-  let _history = [];     // [{filename, createdAt}]
+  let _handle  = null;
+  let _history = [];
 
-  // ── Build backup payload (same as exportData) ──
   function buildBackupData() {
     return {
       version: 2,
@@ -1451,14 +1376,12 @@ const BackupFolderEngine = (() => {
     };
   }
 
-  // ── Filename helper ──
   function makeFilename() {
     const n  = new Date();
     const pad = v => String(v).padStart(2, '0');
     return `workout-backup-${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}-${pad(n.getHours())}-${pad(n.getMinutes())}.json`;
   }
 
-  // ── Fallback: trigger normal file download ──
   function fallbackDownload() {
     const data  = buildBackupData();
     const blob  = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -1470,15 +1393,13 @@ const BackupFolderEngine = (() => {
     URL.revokeObjectURL(url);
   }
 
-  // ── Add entry to history ──
   async function addHistory(filename) {
     _history.unshift({ filename, createdAt: new Date().toISOString() });
     if (_history.length > MAX_HISTORY) _history = _history.slice(0, MAX_HISTORY);
-    try { await idbSet(IDB_KEY_HISTORY, _history); } catch(e) { /* non-fatal */ }
+    try { await idbSet(IDB_KEY_HISTORY, _history); } catch(e) {}
     renderBackupSection();
   }
 
-  // ── Public: init (called at boot) ──
   async function init() {
     try {
       _handle  = await idbGet(IDB_KEY_HANDLE)  || null;
@@ -1489,7 +1410,6 @@ const BackupFolderEngine = (() => {
     }
   }
 
-  // ── Public: selectFolder ──
   async function selectFolder() {
     if (!window.showDirectoryPicker) {
       alert('Your browser does not support folder access. Use Export Backup instead.');
@@ -1498,7 +1418,7 @@ const BackupFolderEngine = (() => {
     try {
       const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
       _handle = handle;
-      try { await idbSet(IDB_KEY_HANDLE, handle); } catch(e) { /* non-fatal */ }
+      try { await idbSet(IDB_KEY_HANDLE, handle); } catch(e) {}
       renderBackupSection();
     } catch(e) {
       if (e.name !== 'AbortError') {
@@ -1507,7 +1427,6 @@ const BackupFolderEngine = (() => {
     }
   }
 
-  // ── Internal: verify + request permission ──
   async function verifyPermission(handle) {
     try {
       let perm = await handle.queryPermission({ mode: 'readwrite' });
@@ -1517,7 +1436,6 @@ const BackupFolderEngine = (() => {
     } catch { return false; }
   }
 
-  // ── Internal: write a file into the stored handle ──
   async function writeToHandle(json, filename) {
     const hasPerm = await verifyPermission(_handle);
     if (!hasPerm) throw new Error('permission_denied');
@@ -1527,7 +1445,6 @@ const BackupFolderEngine = (() => {
     await writable.close();
   }
 
-  // ── Public: saveToFolder ──
   async function saveToFolder() {
     if (!_handle) {
       alert('Please select a backup folder first.');
@@ -1540,7 +1457,6 @@ const BackupFolderEngine = (() => {
       await writeToHandle(json, filename);
       await addHistory(filename);
     } catch(e) {
-      // Permission was lost — ask user to reselect folder and retry once
       alert('Backup folder access was lost. Please select the folder again.');
       try {
         await selectFolder();
@@ -1548,7 +1464,6 @@ const BackupFolderEngine = (() => {
         await writeToHandle(json, filename);
         await addHistory(filename);
       } catch(retryErr) {
-        // Final fallback — trigger normal download
         fallbackDownload();
         await addHistory(filename + ' (downloaded)');
         alert('Folder backup unavailable. Backup was downloaded instead.');
@@ -1556,11 +1471,10 @@ const BackupFolderEngine = (() => {
     }
   }
 
-  // ── Render the backup card section into settings modal ──
   function renderBackupSection() {
     const el = document.getElementById('backup-folder-section');
     if (!el) return;
-    const isLight = document.body.classList.contains('light');
+    const isHeatmap = document.body.classList.contains('heatmap');
 
     const folderLabel = _handle
       ? `<span style="color:#7EC8A8;font-weight:700;">📁 ${_handle.name}</span>`
@@ -1572,15 +1486,15 @@ const BackupFolderEngine = (() => {
           const d = new Date(h.createdAt);
           const label = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) +
                         ', ' + d.toLocaleTimeString('en-IN', {hour:'numeric', minute:'2-digit'});
-          return `<div style="padding:6px 0;border-bottom:1px solid ${isLight?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'};display:flex;justify-content:space-between;align-items:center;gap:8px;">
-            <div style="font-size:11px;font-weight:600;color:${isLight?'#3A3A3A':'#ccc'};word-break:break-all;">${h.filename}</div>
+          return `<div style="padding:6px 0;border-bottom:1px solid ${isHeatmap?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'};display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div style="font-size:11px;font-weight:600;color:${isHeatmap?'#3A3A3A':'#ccc'};word-break:break-all;">${h.filename}</div>
             <div style="font-size:10px;color:#666;white-space:nowrap;flex-shrink:0;">${label}</div>
           </div>`;
         }).join('');
 
     el.innerHTML = `
       <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:10px;">Data &amp; Backups</div>
-      <div id="settings-card-4" style="background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;margin-bottom:10px;">
+      <div id="settings-card-4" style="background:${isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📂 Backup Folder</div>
         <div style="font-size:11px;color:#888;margin-bottom:10px;line-height:1.5">
           Save backups directly to a folder on your device. Your browser must support the File System Access API.
@@ -1596,7 +1510,7 @@ const BackupFolderEngine = (() => {
         </button>
       </div>
 
-      <div id="settings-card-5" style="background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;margin-bottom:10px;">
+      <div id="settings-card-5" style="background:${isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🕒 Recent Backups</div>
         ${historyRows}
       </div>
@@ -1608,16 +1522,13 @@ const BackupFolderEngine = (() => {
 
 window.BackupFolderEngine = BackupFolderEngine;
 
-// ─────────────────────────────────────────────
-// Boot
-// ─────────────────────────────────────────────
 // --- Boot ---
 initState();
 initTheme();
 render();
-// Init backup engine after boot (non-blocking)
 BackupFolderEngine.init().then(() => BackupFolderEngine.renderBackupSection());
 </script>
+
 <!-- Settings Modal -->
 <div id="settings-overlay" onclick="closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(3px);"></div>
 <div id="settings-modal" style="display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:201;border-radius:22px 22px 0 0;padding:0 0 32px;">
@@ -1658,7 +1569,7 @@ BackupFolderEngine.init().then(() => BackupFolderEngine.renderBackupSection());
       </div>
     </div>
 
-    <!-- Backup Folder Section — rendered dynamically by BackupFolderEngine -->
+    <!-- Backup Folder Section -->
     <div id="backup-folder-section" style="padding:0 20px 16px;"></div>
   </div>
 </div>
