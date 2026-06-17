@@ -177,6 +177,22 @@
     border-color:rgba(196,119,65,.3);
     color:#C47741;
   }
+
+  /* ── HEATMAP THEME (Builds on Light mode) ── */
+  body.heatmap .chapter-card {
+    background: var(--heatmap-bg, #ffffff) !important;
+    border: 1px solid rgba(220, 50, 50, 0.15) !important;
+  }
+  body.heatmap .chapter-card.done {
+    border-left: 4px solid #3EA064 !important;
+    opacity: 0.85;
+  }
+  body.heatmap .chapter-card.starred {
+    border: 2px dashed rgba(245,200,66,.8) !important;
+  }
+  body.heatmap .diff-dots {
+    display: none !important;
+  }
 </style>
 </head>
 <body>
@@ -527,7 +543,7 @@ function fmtCountdown(mins) {
 
 // --- Feature 4: Daily hours tracker ---
 function getDailyLog() {
-  const log = {}; // "YYYY-MM-DD" -> total mins
+  const log = {}; // "YYYY-MM-DD" -> total mins (only studied days)
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
     if(watched[lec.id] && timestamps[lec.id]) {
       const d = timestamps[lec.id].slice(0,10);
@@ -536,26 +552,201 @@ function getDailyLog() {
   })));
   return log;
 }
-function renderDailyTracker() {
-  const log = getDailyLog();
-  const days = Object.keys(log).sort().reverse();
-  if(days.length === 0) return `<div style="text-align:center;color:#444;font-size:12px;padding:30px 0">No sessions recorded yet.<br><span style="font-size:10px">Tick a lecture to start tracking.</span></div>`;
-  const maxMins = Math.max(...Object.values(log));
-  const hoursGoal = HOURS_PER_DAY * 60;
-  return days.map(d => {
-    const mins = log[d];
-    const hrs = (mins/60).toFixed(1);
-    const pct = Math.min(100, Math.round(mins/hoursGoal*100));
-    const barColor = mins >= hoursGoal ? '#7EC8A8' : mins >= hoursGoal*0.5 ? '#E8A87C' : '#7EB8C8';
-    const dateObj = new Date(d + 'T00:00:00');
-    const label = dateObj.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-    return `<div class="day-row">
-      <div class="day-label">${label}</div>
-      <div class="day-bar-wrap"><div class="day-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
-      <div class="day-hrs" style="color:${barColor}">${hrs}h</div>
-    </div>`;
-  }).join('');
+
+// Returns a full log from first tick to today, filling 0 for missed days
+function getFullDailyLog() {
+  const sparse = getDailyLog();
+  const studiedDays = Object.keys(sparse).sort();
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  // Always include today even if nothing studied yet
+  if(studiedDays.length === 0) return {[today]: 0};
+  const firstDay = studiedDays[0] < today ? studiedDays[0] : today;
+  const full = {};
+  let cur = new Date(firstDay + 'T00:00:00');
+  const endMs = new Date(today + 'T00:00:00').getTime();
+  while(cur.getTime() <= endMs) {
+    // Use local date parts — never toISOString() which shifts to UTC
+    const key = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
+    full[key] = sparse[key] || 0;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return full;
 }
+
+// Get Monday of the week containing a given YYYY-MM-DD string
+function getMondayOf(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = d.getDay(); // 0=Sun,1=Mon,...
+  const diff = (day === 0) ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0,10);
+}
+
+// Group full log into weeks (keyed by Monday date)
+function groupByWeek(fullLog) {
+  const weeks = {}; // mondayStr -> {days: {dateStr: mins}}
+  Object.keys(fullLog).forEach(d => {
+    const mon = getMondayOf(d);
+    if(!weeks[mon]) weeks[mon] = {};
+    weeks[mon][d] = fullLog[d];
+  });
+  return weeks;
+}
+
+function fmtTime(mins) {
+  if(mins === 0) return '0m';
+  const h = Math.floor(mins/60), m = Math.round(mins%60);
+  return h > 0 && m > 0 ? `${h}h ${m}m` : h > 0 ? `${h}h` : `${m}m`;
+}
+
+function weekStatsHTML(weekDays, isLight, isCurrent) {
+  const vals = Object.values(weekDays);
+  const maxV = Math.max(...vals);
+  const minV = Math.min(...vals);
+  const avgV = vals.reduce((a,b)=>a+b,0) / vals.length;
+  const totalV = vals.reduce((a,b)=>a+b,0);
+
+  // trend arrow vs previous week not available here, handled outside
+  const stats = [
+    {label:'MIN', val:minV, color:'#7EB8C8'},
+    {label:'AVG', val:avgV, color:'#E8A87C'},
+    {label:'MAX', val:maxV, color:'#7EC8A8'},
+    {label:'TOTAL', val:totalV, color:isCurrent?'#A07EC8':'#888'},
+  ];
+  return `<div style="display:flex;gap:6px;">
+    ${stats.map(({label,val,color}) => `
+      <div style="flex:1;background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:10px;padding:8px 4px;text-align:center;">
+        <div style="font-size:8px;font-weight:700;letter-spacing:.8px;color:#666;text-transform:uppercase;margin-bottom:3px;">${label}</div>
+        <div style="font-size:13px;font-weight:800;color:${color};">${fmtTime(val)}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+let weekHistoryOpen = {};
+
+function renderDailyTracker() {
+  const isLight = document.body.classList.contains('light');
+  const fullLog = getFullDailyLog();
+  const allDays = Object.keys(fullLog).sort().reverse();
+
+  const hoursGoal = HOURS_PER_DAY * 60;
+  const todayNow = new Date();
+  const todayStr = `${todayNow.getFullYear()}-${String(todayNow.getMonth()+1).padStart(2,'0')}-${String(todayNow.getDate()).padStart(2,'0')}`;
+  const todayMins = fullLog[todayStr] || 0;
+  const todayPct = Math.min(100, Math.round(todayMins / hoursGoal * 100));
+  const todayBarColor = todayMins === 0 ? 'rgba(126,200,168,.3)' : todayMins >= hoursGoal ? '#7EC8A8' : todayMins >= hoursGoal * 0.5 ? '#E8A87C' : '#7EB8C8';
+  const todayLabel = todayNow.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
+
+  const todayCard = `<div style="background:${isLight?'rgba(126,200,168,.08)':'rgba(126,200,168,.07)'};border:1.5px solid rgba(126,200,168,.3);border-radius:16px;padding:16px 18px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:#7EC8A8;text-transform:uppercase;margin-bottom:3px;">Today</div>
+        <div style="font-size:13px;font-weight:700;color:#ccc;">${todayLabel}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:22px;font-weight:800;color:${todayBarColor};">${todayMins === 0 ? '—' : fmtTime(todayMins)}</div>
+        <div style="font-size:10px;color:#555;">${todayMins === 0 ? 'Nothing yet' : `${todayPct}% of ${HOURS_PER_DAY}h goal`}</div>
+      </div>
+    </div>
+    <div style="height:7px;background:${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;margin-top:10px;">
+      <div style="height:100%;width:${todayPct}%;background:${todayBarColor};border-radius:4px;transition:width .4s ease;"></div>
+    </div>
+  </div>`;
+
+  if(allDays.length === 0) return todayCard;
+
+  const weeks = groupByWeek(fullLog);
+  const todayMon = getMondayOf(todayStr);
+  const sortedWeeks = Object.keys(weeks).sort().reverse(); // newest first
+
+  let html = todayCard;
+
+  sortedWeeks.forEach((mon, wi) => {
+    const weekDays = weeks[mon]; // {dateStr: mins}
+    const isCurrent = mon === todayMon;
+    const weekDaysSorted = Object.keys(weekDays).sort().reverse();
+    const sunDate = new Date(mon + 'T00:00:00');
+    sunDate.setDate(sunDate.getDate() + 6);
+    const monLabel = new Date(mon + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const sunLabel = sunDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const weekLabel = `${monLabel} – ${sunLabel}`;
+
+    // Day cards for this week
+    const dayCards = weekDaysSorted.filter(d => d !== todayStr).map(d => {
+      const mins = weekDays[d];
+      const timeStr = mins === 0 ? '—' : fmtTime(mins);
+      const pct = Math.min(100, Math.round(mins/hoursGoal*100));
+      const barColor = mins === 0 ? 'rgba(255,255,255,.1)' : mins >= hoursGoal ? '#7EC8A8' : mins >= hoursGoal*0.5 ? '#E8A87C' : '#7EB8C8';
+      const textColor = mins === 0 ? '#444' : barColor;
+      const dateObj = new Date(d + 'T00:00:00');
+      const label = dateObj.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+      const todayLocal = new Date();
+      const isToday = d === `${todayLocal.getFullYear()}-${String(todayLocal.getMonth()+1).padStart(2,'0')}-${String(todayLocal.getDate()).padStart(2,'0')}`;
+      return `<div style="background:${mins===0?(isLight?'rgba(0,0,0,.02)':'rgba(255,255,255,.02)'):(isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)')};border:1px solid ${mins===0?(isLight?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'):(isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)')};border-radius:14px;padding:14px 16px;margin-bottom:8px;${isToday?'border-color:rgba(126,200,168,.35);':''}" >
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${mins>0?'10px':'0'};">
+          <div style="font-size:13px;font-weight:700;color:${mins===0?'#555':'#ccc'}">${label}${isToday?' <span style="font-size:9px;background:rgba(126,200,168,.15);color:#7EC8A8;padding:1px 6px;border-radius:8px;font-weight:700;">TODAY</span>':''}</div>
+          <div style="font-size:15px;font-weight:800;color:${textColor}">${timeStr}</div>
+        </div>
+        ${mins > 0 ? `<div style="height:6px;background:${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width .4s ease;"></div>
+        </div>
+        <div style="font-size:10px;color:#555;margin-top:5px;text-align:right">${pct}% of ${HOURS_PER_DAY}h goal</div>` : ''}
+      </div>`;
+    }).join('');
+
+    // Trend vs previous week
+    let trendHTML = '';
+    if(wi < sortedWeeks.length - 1) {
+      const prevMon = sortedWeeks[wi + 1];
+      const prevVals = Object.values(weeks[prevMon]);
+      const curAvg = Object.values(weekDays).reduce((a,b)=>a+b,0)/Object.values(weekDays).length;
+      const prevAvg = prevVals.reduce((a,b)=>a+b,0)/prevVals.length;
+      const diff = curAvg - prevAvg;
+      if(Math.abs(diff) > 1) {
+        const up = diff > 0;
+        trendHTML = `<span style="font-size:10px;font-weight:700;color:${up?'#7EC8A8':'#E87C7C'};margin-left:8px;">${up?'▲':'▼'} ${fmtTime(Math.abs(diff))} avg vs prev week</span>`;
+      }
+    }
+
+    if(isCurrent) {
+      // Current week: always expanded, stats shown at bottom
+      html += `<div style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:#7EC8A8;text-transform:uppercase;">This Week · ${weekLabel}</div>
+          ${trendHTML}
+        </div>
+        ${dayCards}
+        <div style="margin-top:8px;">${weekStatsHTML(weekDays, isLight, true)}</div>
+      </div>`;
+    } else {
+      // Past week: collapsible
+      const isOpen = !!weekHistoryOpen[mon];
+      html += `<div style="margin-bottom:10px;">
+        <button onclick="toggleWeekHistory('${mon}')" style="width:100%;background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:inherit;">
+          <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#888;text-transform:uppercase;text-align:left;">Week · ${weekLabel}</div>
+            ${trendHTML}
+          </div>
+          <span style="font-size:16px;color:#555;transition:transform .2s;${isOpen?'transform:rotate(90deg)':''}">›</span>
+        </button>
+        ${isOpen ? `<div style="margin-top:8px;">${dayCards}<div style="margin-top:8px;">${weekStatsHTML(weekDays, isLight, false)}</div></div>` : ''}
+      </div>`;
+    }
+  });
+
+  return html;
+}
+
+window.toggleWeekHistory = function(mon) {
+  weekHistoryOpen[mon] = !weekHistoryOpen[mon];
+  const pages = document.getElementById('pages');
+  pages.innerHTML = `<div class="page visible">
+    <div class="card" style="padding:16px 18px">
+      ${renderDailyTracker()}
+    </div>
+  </div>`;
+};
 
 // --- SVG Ring ---
 function makeSVGRing(pct, size, sw, color, labelSize) {
@@ -716,19 +907,24 @@ function renderSubject(sub) {
     // difficulty: 1–5 dots based on total duration relative to subject min/max
     const chTotal = chTotals[idx];
     let dots;
+    let norm = 0;
     if(maxTotal === minTotal) {
       dots = 3;
+      norm = 0.5;
     } else {
-      dots = Math.round(1 + ((chTotal - minTotal) / (maxTotal - minTotal)) * 4);
+      norm = (chTotal - minTotal) / (maxTotal - minTotal);
+      dots = Math.round(1 + norm * 4);
     }
     const dotColor = cs.allDone ? '#7EC8A8' : sub.color;
-    const dotHTML = Array.from({length:5},(_,i) =>
+    const dotHTML = `<span class="diff-dots" style="margin-left:2px;letter-spacing:1px">` + Array.from({length:5},(_,i) =>
       `<span style="font-size:8px;color:${i < dots ? dotColor : 'rgba(128,128,128,.25)'}">●</span>`
-    ).join('');
+    ).join('') + `</span>`;
 
     const isStarred = !!starred[ch.id];
+    // Create a linear gradient over pure white to mix the semi-transparent red properly on all browsers
+    const heatmapBg = `linear-gradient(rgba(220,50,50,${norm * 0.45}), rgba(220,50,50,${norm * 0.45})), #ffffff`;
 
-    html += `<div class="chapter-card${cs.allDone?' done':''}${isStarred?' starred':''}" id="chcard_${ch.id}">
+    html += `<div class="chapter-card${cs.allDone?' done':''}${isStarred?' starred':''}" id="chcard_${ch.id}" style="--heatmap-bg: ${heatmapBg};">
       <div class="chapter-header" onclick="toggleChapter('${ch.id}')">
         ${makeSVGRing(cs.pct,40,4,cs.allDone?'#7EC8A8':sub.color,9)}
         <div style="flex:1;min-width:0">
@@ -737,7 +933,7 @@ function renderSubject(sub) {
             ${cs.allDone?'<span style="font-size:12px">✓</span>':''}
             ${isStarred?'<span style="font-size:12px;line-height:1" title="New resources available">⭐</span>':''}
             <span style="font-size:9px;color:#666;font-weight:600;margin-left:2px">${lecCount} lec${lecCount!==1?'s':''}</span>
-            <span style="margin-left:2px;letter-spacing:1px">${dotHTML}</span>
+            ${dotHTML}
           </div>
           <div class="ch-name">${ch.name}</div>
           <div class="ch-time">${cs.allDone
@@ -766,7 +962,10 @@ function renderSubject(sub) {
           let dateBadge = '';
           if(isDone && timestamps[lec.id]) {
             const d = new Date(timestamps[lec.id]);
-            dateBadge = `<div class="lec-date">${d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>`;
+            const dateStr = d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+            dateBadge = `<div class="lec-date" onclick="(function(e){e.stopPropagation();editLecDate('${lec.id}',event);})(event)" style="cursor:pointer;display:inline-flex;align-items:center;gap:3px;border-bottom:1px dashed rgba(255,255,255,.15);padding-bottom:1px;" title="Tap to edit date">
+              ${dateStr} <span style="font-size:8px;opacity:.5">✏️</span>
+            </div>`;
           }
           return `<div class="lec-row" onclick="toggleLec('${sub.id}','${ch.id}','${lec.id}')">
             <div class="lec-check" style="background:${checkBg};color:${checkColor}">${isDone?'✓':li+1}</div>
@@ -791,18 +990,8 @@ function render() {
   if(currentTab === 'overview') {
     pages.innerHTML = `<div class="page visible">${renderOverview()}</div>`;
   } else if(currentTab === 'daily') {
-    const g = globalStats();
-    const totalLogged = Object.values(getDailyLog()).reduce((a,b)=>a+b,0);
     pages.innerHTML = `<div class="page visible">
-      <div class="card" style="border-radius:18px;padding:16px;margin-bottom:14px;border-color:rgba(255,255,255,.07)">
-        <div style="font-size:13px;color:#888;margin-bottom:10px;font-weight:600">Study Sessions</div>
-        <div style="display:flex;gap:16px;margin-bottom:4px">
-          <div><div style="font-size:18px;font-weight:800">${(totalLogged/60).toFixed(1)}h</div><div style="font-size:10px;color:#555">Total logged</div></div>
-          <div><div style="font-size:18px;font-weight:800;color:#E8A87C">${HOURS_PER_DAY}h/day</div><div style="font-size:10px;color:#555">Daily goal</div></div>
-        </div>
-        <div style="font-size:10px;color:#444;margin-top:6px">Bar = % of ${HOURS_PER_DAY}h daily goal · Orange = halfway · Green = goal met</div>
-      </div>
-      <div class="card" style="padding:14px 16px">
+      <div class="card" style="padding:16px 18px">
         ${renderDailyTracker()}
       </div>
     </div>`;
@@ -827,19 +1016,153 @@ window.toggleChapter = function(chId) {
   pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
 };
 
+
+// --- Chapter celebration ---
+function celebrateChapter(chName, doneChs, totalChs) {
+  const existing = document.getElementById('chapter-celebrate');
+  if(existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.id = 'chapter-celebrate';
+  el.style.cssText = 'position:fixed;inset:0;z-index:500;overflow:hidden;';
+
+  // Confetti particles
+  const colors = ['#7EC8A8','#E8A87C','#7EB8C8','#A07EC8','#F5C842','#E87C7C'];
+  const particles = Array.from({length:60}, (_,i) => {
+    const color = colors[i % colors.length];
+    const left = Math.random()*100;
+    const delay = Math.random()*0.6;
+    const dur = 1.8 + Math.random()*1.2;
+    const size = 5 + Math.random()*7;
+    const shape = Math.random() > 0.5 ? '50%' : '2px';
+    return `<div style="position:absolute;left:${left}%;top:-10px;width:${size}px;height:${size}px;background:${color};border-radius:${shape};animation:confetti-fall ${dur}s ${delay}s ease-in forwards;opacity:0;pointer-events:none;"></div>`;
+  }).join('');
+
+  const remaining = totalChs - doneChs;
+  const remainingText = remaining === 0
+    ? '🎓 All chapters done!'
+    : `${remaining} more to go`;
+
+  el.innerHTML = `
+    <style>
+      @keyframes confetti-fall {
+        0%   { transform:translateY(0) rotate(0deg);   opacity:1; }
+        80%  { opacity:1; }
+        100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+      }
+      @keyframes celebrate-pop {
+        0%   { transform:translateX(-50%) scale(.5);  opacity:0; }
+        60%  { transform:translateX(-50%) scale(1.08); opacity:1; }
+        80%  { transform:translateX(-50%) scale(.97); }
+        100% { transform:translateX(-50%) scale(1);   opacity:1; }
+      }
+    
+  /* ── HEATMAP THEME (Builds on Light mode) ── */
+  body.heatmap .chapter-card {
+    background: var(--heatmap-bg, #ffffff) !important;
+    border: 1px solid rgba(220, 50, 50, 0.15) !important;
+  }
+  body.heatmap .chapter-card.done {
+    border-left: 4px solid #3EA064 !important;
+    opacity: 0.85;
+  }
+  body.heatmap .chapter-card.starred {
+    border: 2px dashed rgba(245,200,66,.8) !important;
+  }
+  body.heatmap .diff-dots {
+    display: none !important;
+  }
+</style>
+    ${particles}
+    <div style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1A1D28,#222638);border:1.5px solid rgba(126,200,168,.45);border-radius:20px;padding:20px 24px;text-align:center;min-width:270px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:celebrate-pop .5s cubic-bezier(.34,1.56,.64,1) forwards;">
+      <div style="font-size:28px;margin-bottom:8px;">🎉</div>
+      <div style="font-size:14px;font-weight:800;color:#7EC8A8;letter-spacing:-.2px;margin-bottom:4px;">Chapter Complete!</div>
+      <div style="font-size:12px;color:#ddd;font-weight:600;margin-bottom:6px;line-height:1.4;">${chName}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:16px;">
+        <span style="color:#E8A87C;font-weight:700;">${doneChs}/${totalChs}</span> chapters done &nbsp;·&nbsp; ${remainingText}
+      </div>
+      <button onclick="document.getElementById('chapter-celebrate').remove()" style="width:100%;padding:10px;border-radius:12px;border:none;background:linear-gradient(135deg,#7EC8A8,#5aaa88);color:#0F1117;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.2px;">Let's go 🚀</button>
+    </div>`;
+
+  document.body.appendChild(el);
+}
+
 window.toggleLec = function(subId, chId, lecId) {
   const nowTicking = !watched[lecId];
   watched[lecId] = nowTicking;
   if(nowTicking) {
-    timestamps[lecId] = new Date().toISOString();
+    const n = new Date();
+    timestamps[lecId] = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}T${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
   } else {
     delete timestamps[lecId];
   }
   save();
   const sub = SUBJECTS.find(s=>s.id===subId);
+  // Check if this tick just completed the chapter
+  if(nowTicking) {
+    const ch = sub.chapters.find(c=>c.id===chId);
+    const cs = chStats(ch);
+    if(cs.allDone) {
+      const cStats = chapterStats();
+      celebrateChapter(ch.name, cStats.done, cStats.total);
+    }
+  }
   const pages = document.getElementById('pages');
   pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
   renderHeader();
+};
+
+window.editLecDate = function(lecId, e) {
+  e.stopPropagation();
+  // Get current date value for the input default
+  const _ed = new Date();
+  const _edToday = `${_ed.getFullYear()}-${String(_ed.getMonth()+1).padStart(2,'0')}-${String(_ed.getDate()).padStart(2,'0')}`;
+  const current = timestamps[lecId] ? timestamps[lecId].slice(0,10) : _edToday;
+
+  // Remove any existing picker
+  const existing = document.getElementById('date-edit-overlay');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'date-edit-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);';
+
+  const isLight = document.body.classList.contains('light');
+  overlay.innerHTML = `
+    <div style="background:${isLight?'#F0EEE9':'#1A1D28'};border-radius:22px 22px 0 0;border:1px solid ${isLight?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)'};border-bottom:none;width:100%;max-width:480px;padding:24px 24px 40px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:800;">📅 Edit Study Date</div>
+        <button onclick="document.getElementById('date-edit-overlay').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:28px;height:28px;font-size:14px;color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div style="font-size:11px;color:#888;margin-bottom:14px;line-height:1.5;">Change the date this lecture was actually studied. The daily log will update automatically.</div>
+      <input type="date" id="date-edit-input" value="${current}" max="${_edToday}"
+        style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid ${isLight?'rgba(0,0,0,.15)':'rgba(255,255,255,.15)'};background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.06)'};color:${isLight?'#1E1B16':'#E8EAF0'};font-size:15px;font-family:inherit;box-sizing:border-box;margin-bottom:14px;outline:none;">
+      <button onclick="(function(){
+        const val = document.getElementById('date-edit-input').value;
+        if(!val) return;
+        const existing = timestamps['${lecId}'];
+        const time = existing ? existing.slice(11) : 'T12:00:00.000Z'.slice(1);
+        timestamps['${lecId}'] = val + 'T' + time;
+        save();
+        render();
+        document.getElementById('date-edit-overlay').remove();
+      })()" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#7EC8A8,#5aaa88);color:#0F1117;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">
+        ✓ Save Date
+      </button>
+      <button onclick="(function(){
+        delete timestamps['${lecId}'];
+        save();
+        render();
+        document.getElementById('date-edit-overlay').remove();
+      })()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(232,124,124,.4);background:rgba(232,124,124,.1);color:#E87C7C;font-size:14px;font-weight:700;cursor:pointer;">
+        🗑 Remove Date (exclude from tracker)
+      </button>
+    </div>`;
+
+  overlay.addEventListener('click', function(ev) {
+    if(ev.target === overlay) overlay.remove();
+  });
+  document.body.appendChild(overlay);
 };
 
 window.toggleStar = function(subId, chId, e) {
@@ -855,13 +1178,28 @@ window.toggleStar = function(subId, chId, e) {
 window.markAll = function(subId, chId, val) {
   const sub = SUBJECTS.find(s=>s.id===subId);
   const ch = sub.chapters.find(c=>c.id===chId);
-  const now = new Date().toISOString();
+  const _n = new Date();
+  const now = `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}T${String(_n.getHours()).padStart(2,'0')}:${String(_n.getMinutes()).padStart(2,'0')}:${String(_n.getSeconds()).padStart(2,'0')}`;
   ch.lectures.forEach(l=>{
-    watched[l.id]=val;
-    if(val) { if(!timestamps[l.id]) timestamps[l.id]=now; }
-    else { delete timestamps[l.id]; }
+    if(val) {
+      if(!watched[l.id]) {
+        watched[l.id] = true;
+        if(!timestamps[l.id]) timestamps[l.id] = now;
+      }
+    } else {
+      watched[l.id] = false;
+      delete timestamps[l.id];
+    }
   });
   save();
+  // Celebrate if marking all done and chapter is now complete
+  if(val) {
+    const cs = chStats(ch);
+    if(cs.allDone) {
+      const cStats = chapterStats();
+      celebrateChapter(ch.name, cStats.done, cStats.total);
+    }
+  }
   const pages = document.getElementById('pages');
   pages.innerHTML = `<div class="page visible">${renderSubject(sub)}</div>`;
   renderHeader();
@@ -904,8 +1242,12 @@ function handleSwipe() {
 // --- Settings modal ---
 window.openSettings = function() {
   document.getElementById('settings-overlay').style.display = 'block';
-  document.getElementById('settings-modal').style.display = 'block';
+  const modal = document.getElementById('settings-modal');
+  modal.style.display = 'block';
+  modal.style.maxHeight = '88vh';
+  modal.style.overflowY = 'auto';
   document.getElementById('import-msg').style.display = 'none';
+  BackupFolderEngine.renderBackupSection();
 };
 window.closeSettings = function() {
   document.getElementById('settings-overlay').style.display = 'none';
@@ -1003,27 +1345,278 @@ window.importData = function(e) {
 };
 
 // --- Theme toggle ---
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
+let currentTheme = 'dark';
+
+function applyTheme(theme) {
+  document.body.classList.remove('light', 'heatmap');
+  if (theme === 'light') document.body.classList.add('light');
+  if (theme === 'heatmap') document.body.classList.add('light', 'heatmap');
+
   const btn = document.getElementById('theme-toggle');
-  btn.textContent = isLight ? '🌙 Dark' : '☀️ Light';
-  try { localStorage.setItem('ca_theme', isLight ? 'light' : 'dark'); } catch{}
+  if (btn) {
+    if (theme === 'dark') btn.textContent = '☀️ Light';
+    else if (theme === 'light') btn.textContent = '🔥 Heatmap';
+    else btn.textContent = '🌙 Dark';
+  }
 }
+
+function toggleTheme() {
+  if (currentTheme === 'dark') currentTheme = 'light';
+  else if (currentTheme === 'light') currentTheme = 'heatmap';
+  else currentTheme = 'dark';
+
+  applyTheme(currentTheme);
+  try { localStorage.setItem('ca_theme', currentTheme); } catch{}
+}
+
 function initTheme() {
   try {
     const saved = localStorage.getItem('ca_theme');
-    if(saved === 'light') {
-      document.body.classList.add('light');
-      const btn = document.getElementById('theme-toggle');
-      if(btn) btn.textContent = '🌙 Dark';
+    if (saved === 'light' || saved === 'heatmap' || saved === 'dark') {
+      currentTheme = saved;
     }
   } catch{}
+  applyTheme(currentTheme);
 }
 
+// ─────────────────────────────────────────────
+// BackupFolderEngine
+// ─────────────────────────────────────────────
+const BackupFolderEngine = (() => {
+  const IDB_KEY_HANDLE  = 'backupFolderHandle';
+  const IDB_KEY_HISTORY = 'backupHistory';
+  const MAX_HISTORY     = 20;
+
+  // ── IndexedDB helpers (reuse existing DB "ca-tracker" store "settings") ──
+  function idbGet(key) {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('ca-tracker', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('settings');
+      req.onerror  = () => rej(req.error);
+      req.onsuccess = e => {
+        const db  = e.target.result;
+        // Make sure the store exists; if not, resolve null
+        if (!db.objectStoreNames.contains('settings')) { db.close(); return res(null); }
+        const tx  = db.transaction('settings', 'readonly');
+        const get = tx.objectStore('settings').get(key);
+        get.onsuccess = () => { db.close(); res(get.result ?? null); };
+        get.onerror   = () => { db.close(); rej(get.error); };
+      };
+    });
+  }
+
+  function idbSet(key, value) {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open('ca-tracker', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('settings');
+      req.onerror  = () => rej(req.error);
+      req.onsuccess = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('settings')) {
+          db.close();
+          // Create the store via version bump
+          db.close();
+          const req2 = indexedDB.open('ca-tracker', db.version + 1);
+          req2.onupgradeneeded = ev => ev.target.result.createObjectStore('settings');
+          req2.onsuccess = ev2 => {
+            const db2 = ev2.target.result;
+            const tx  = db2.transaction('settings', 'readwrite');
+            const put = tx.objectStore('settings').put(value, key);
+            put.onsuccess = () => { db2.close(); res(); };
+            put.onerror   = () => { db2.close(); rej(put.error); };
+          };
+          return;
+        }
+        const tx  = db.transaction('settings', 'readwrite');
+        const put = tx.objectStore('settings').put(value, key);
+        put.onsuccess = () => { db.close(); res(); };
+        put.onerror   = () => { db.close(); rej(put.error); };
+      };
+    });
+  }
+
+  // ── State ──
+  let _handle  = null;   // FileSystemDirectoryHandle | null
+  let _history = [];     // [{filename, createdAt}]
+
+  // ── Build backup payload (same as exportData) ──
+  function buildBackupData() {
+    return {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      watched,
+      timestamps,
+      starred,
+      subjects: SUBJECTS
+    };
+  }
+
+  // ── Filename helper ──
+  function makeFilename() {
+    const n  = new Date();
+    const pad = v => String(v).padStart(2, '0');
+    return `workout-backup-${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}-${pad(n.getHours())}-${pad(n.getMinutes())}.json`;
+  }
+
+  // ── Fallback: trigger normal file download ──
+  function fallbackDownload() {
+    const data  = buildBackupData();
+    const blob  = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url   = URL.createObjectURL(blob);
+    const a     = document.createElement('a');
+    a.href      = url;
+    a.download  = makeFilename();
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Add entry to history ──
+  async function addHistory(filename) {
+    _history.unshift({ filename, createdAt: new Date().toISOString() });
+    if (_history.length > MAX_HISTORY) _history = _history.slice(0, MAX_HISTORY);
+    try { await idbSet(IDB_KEY_HISTORY, _history); } catch(e) { /* non-fatal */ }
+    renderBackupSection();
+  }
+
+  // ── Public: init (called at boot) ──
+  async function init() {
+    try {
+      _handle  = await idbGet(IDB_KEY_HANDLE)  || null;
+      _history = await idbGet(IDB_KEY_HISTORY) || [];
+    } catch(e) {
+      _handle  = null;
+      _history = [];
+    }
+  }
+
+  // ── Public: selectFolder ──
+  async function selectFolder() {
+    if (!window.showDirectoryPicker) {
+      alert('Your browser does not support folder access. Use Export Backup instead.');
+      return;
+    }
+    try {
+      const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      _handle = handle;
+      try { await idbSet(IDB_KEY_HANDLE, handle); } catch(e) { /* non-fatal */ }
+      renderBackupSection();
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        alert('Could not open folder: ' + e.message);
+      }
+    }
+  }
+
+  // ── Internal: verify + request permission ──
+  async function verifyPermission(handle) {
+    try {
+      let perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm === 'granted') return true;
+      perm = await handle.requestPermission({ mode: 'readwrite' });
+      return perm === 'granted';
+    } catch { return false; }
+  }
+
+  // ── Internal: write a file into the stored handle ──
+  async function writeToHandle(json, filename) {
+    const hasPerm = await verifyPermission(_handle);
+    if (!hasPerm) throw new Error('permission_denied');
+    const fileHandle = await _handle.getFileHandle(filename, { create: true });
+    const writable   = await fileHandle.createWritable();
+    await writable.write(json);
+    await writable.close();
+  }
+
+  // ── Public: saveToFolder ──
+  async function saveToFolder() {
+    if (!_handle) {
+      alert('Please select a backup folder first.');
+      return;
+    }
+    const filename = makeFilename();
+    const json     = JSON.stringify(buildBackupData(), null, 2);
+
+    try {
+      await writeToHandle(json, filename);
+      await addHistory(filename);
+    } catch(e) {
+      // Permission was lost — ask user to reselect folder and retry once
+      alert('Backup folder access was lost. Please select the folder again.');
+      try {
+        await selectFolder();
+        if (!_handle) throw new Error('No folder selected after reselect');
+        await writeToHandle(json, filename);
+        await addHistory(filename);
+      } catch(retryErr) {
+        // Final fallback — trigger normal download
+        fallbackDownload();
+        await addHistory(filename + ' (downloaded)');
+        alert('Folder backup unavailable. Backup was downloaded instead.');
+      }
+    }
+  }
+
+  // ── Render the backup card section into settings modal ──
+  function renderBackupSection() {
+    const el = document.getElementById('backup-folder-section');
+    if (!el) return;
+    const isLight = document.body.classList.contains('light');
+
+    const folderLabel = _handle
+      ? `<span style="color:#7EC8A8;font-weight:700;">📁 ${_handle.name}</span>`
+      : `<span style="color:#666;">No backup folder selected</span>`;
+
+    const historyRows = _history.length === 0
+      ? `<div style="font-size:11px;color:#555;padding:6px 0;">No backups yet.</div>`
+      : _history.slice(0, 10).map(h => {
+          const d = new Date(h.createdAt);
+          const label = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) +
+                        ', ' + d.toLocaleTimeString('en-IN', {hour:'numeric', minute:'2-digit'});
+          return `<div style="padding:6px 0;border-bottom:1px solid ${isLight?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'};display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div style="font-size:11px;font-weight:600;color:${isLight?'#3A3A3A':'#ccc'};word-break:break-all;">${h.filename}</div>
+            <div style="font-size:10px;color:#666;white-space:nowrap;flex-shrink:0;">${label}</div>
+          </div>`;
+        }).join('');
+
+    el.innerHTML = `
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:10px;">Data &amp; Backups</div>
+      <div id="settings-card-4" style="background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📂 Backup Folder</div>
+        <div style="font-size:11px;color:#888;margin-bottom:10px;line-height:1.5">
+          Save backups directly to a folder on your device. Your browser must support the File System Access API.
+        </div>
+
+        <div style="font-size:11px;margin-bottom:12px;">${folderLabel}</div>
+
+        <button onclick="BackupFolderEngine.selectFolder()" style="width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">
+          📂 Select Backup Folder
+        </button>
+        <button onclick="BackupFolderEngine.saveToFolder()" style="width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+          💾 Save Backup To Folder
+        </button>
+      </div>
+
+      <div id="settings-card-5" style="background:${isLight?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)'};border:1px solid ${isLight?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)'};border-radius:14px;padding:14px 16px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🕒 Recent Backups</div>
+        ${historyRows}
+      </div>
+    `;
+  }
+
+  return { init, selectFolder, saveToFolder, renderBackupSection };
+})();
+
+window.BackupFolderEngine = BackupFolderEngine;
+
+// ─────────────────────────────────────────────
+// Boot
+// ─────────────────────────────────────────────
 // --- Boot ---
 initState();
 initTheme();
 render();
+// Init backup engine after boot (non-blocking)
+BackupFolderEngine.init().then(() => BackupFolderEngine.renderBackupSection());
 </script>
 <!-- Settings Modal -->
 <div id="settings-overlay" onclick="closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(3px);"></div>
@@ -1064,6 +1657,9 @@ render();
         <div style="font-size:10px;color:#666;text-align:center;">Edit & re-import as backup to apply changes</div>
       </div>
     </div>
+
+    <!-- Backup Folder Section — rendered dynamically by BackupFolderEngine -->
+    <div id="backup-folder-section" style="padding:0 20px 16px;"></div>
   </div>
 </div>
 <script>
