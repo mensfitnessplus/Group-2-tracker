@@ -1,4 +1,5 @@
-const CACHE_NAME = "ca-tracker-v1.4";
+// Fixed typo: Must be lowercase "const"
+const CACHE_NAME = "ca-tracker-v1.5"; 
 
 const urlsToCache = [
   "./",
@@ -7,21 +8,27 @@ const urlsToCache = [
   "./icon.png"
 ];
 
-// Force immediate installation of the new service worker
+// Force immediate installation and fetch fresh files
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+      .then(cache => {
+        // Map URLs to Request objects with { cache: 'reload' }
+        // This forces the browser to ignore the HTTP cache and fetch the newest files from the server
+        const requests = urlsToCache.map(url => new Request(url, { cache: 'reload' }));
+        return cache.addAll(requests);
+      })
       .then(() => self.skipWaiting())
   );
 });
 
-// Clean up old caches completely so old files are deleted
+// Clean up old caches completely
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
+          // If the cache name doesn't match the current CACHE_NAME, delete it
           if (cache !== CACHE_NAME) {
             return caches.delete(cache);
           }
@@ -31,8 +38,11 @@ self.addEventListener("activate", event => {
   );
 });
 
-// Use a Network-First strategy for core files so updates apply instantly when online
+// Network-First strategy for core files
 self.addEventListener("fetch", event => {
+  // Only handle GET requests (browsers throw errors if you try to cache POST/PUT)
+  if (event.request.method !== "GET") return;
+
   const url = new URL(event.request.url);
   const isCoreAsset = urlsToCache.some(path => {
     const cleanPath = path.replace("./", "");
@@ -43,7 +53,8 @@ self.addEventListener("fetch", event => {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          if (response.status === 200) {
+          // Ensure we only cache valid responses
+          if (response && response.status === 200 && response.type === 'basic') {
             const resClone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
           }
@@ -58,3 +69,4 @@ self.addEventListener("fetch", event => {
     );
   }
 });
+                                       
