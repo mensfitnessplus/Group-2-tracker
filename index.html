@@ -538,6 +538,63 @@ function getFullDailyLog() {
   return full;
 }
 
+// --- Feature 5: Cumulative lecture-count log per day ---
+// For every date that appears in the daily log, compute the running TOTAL
+// number of lectures completed by the end of that date (cumulative count).
+// This is always derived fresh from `watched`+`timestamps`, so each date
+// naturally holds only its latest/most-updated value — nothing stale is stored.
+function getLectureCountByDate() {
+  // Collect each completed lecture's completion date (most recent edit wins
+  // automatically since timestamps[lecId] is a single value per lecture).
+  const datesWithCompletions = [];
+  let undatedCompletedCount = 0; // watched=true but no timestamp (old data, imports, etc.)
+  SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
+    if(watched[lec.id]) {
+      if(timestamps[lec.id]) {
+        datesWithCompletions.push(timestamps[lec.id].slice(0,10));
+      } else {
+        undatedCompletedCount++;
+      }
+    }
+  })));
+  datesWithCompletions.sort();
+
+  // Build per-date count (how many lectures were completed ON that date).
+  const countOnDate = {};
+  datesWithCompletions.forEach(d => { countOnDate[d] = (countOnDate[d] || 0) + 1; });
+
+  // Lectures marked done with no timestamp aren't dropped — they're folded into
+  // the earliest dated entry (or today, if there are no dated entries at all),
+  // so totals always match the real "videos watched" count.
+  if(undatedCompletedCount > 0) {
+    const earliestDate = datesWithCompletions.length > 0
+      ? datesWithCompletions[0]
+      : (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`; })();
+    countOnDate[earliestDate] = (countOnDate[earliestDate] || 0) + undatedCompletedCount;
+  }
+
+  // Build cumulative running totals across sorted dates.
+  const sortedDates = Object.keys(countOnDate).sort();
+  let running = 0;
+  const cumulative = {};
+  sortedDates.forEach(d => {
+    running += countOnDate[d];
+    cumulative[d] = running; // total lectures completed as of THIS date
+  });
+  return { cumulative, sortedDates, finalTotal: running };
+}
+
+// Given any date string (YYYY-MM-DD), return the total lectures completed
+// by the end of that date (carries forward from the last dated entry on/before it).
+function lecturesCompletedAsOf(dateStr, cumulative, sortedDates) {
+  let result = 0;
+  for(const d of sortedDates) {
+    if(d <= dateStr) result = cumulative[d];
+    else break;
+  }
+  return result;
+}
+
 function getMondayOf(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
   const day = d.getDay();
@@ -590,6 +647,7 @@ function renderDailyTracker() {
   const isHeatmap = document.body.classList.contains('heatmap');
   const fullLog = getFullDailyLog();
   const allDays = Object.keys(fullLog).sort().reverse();
+  const { cumulative: lecCumulative, sortedDates: lecSortedDates } = getLectureCountByDate();
 
   const hoursGoal = HOURS_PER_DAY * 60;
   const todayNow = new Date();
@@ -598,6 +656,7 @@ function renderDailyTracker() {
   const todayPct = Math.min(100, Math.round(todayMins / hoursGoal * 100));
   const todayBarColor = todayMins === 0 ? 'rgba(126,200,168,.3)' : todayMins >= hoursGoal ? '#7EC8A8' : todayMins >= hoursGoal * 0.5 ? '#E8A87C' : '#7EB8C8';
   const todayLabel = todayNow.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
+  const todayLecTotal = lecSortedDates.includes(todayStr) ? lecturesCompletedAsOf(todayStr, lecCumulative, lecSortedDates) : 0;
 
   const todayCard = `<div style="background:${isHeatmap?'rgba(62,160,100,.08)':'rgba(126,200,168,.07)'};border:1.5px solid rgba(126,200,168,.3);border-radius:16px;padding:16px 18px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -613,6 +672,9 @@ function renderDailyTracker() {
     <div style="height:7px;background:${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};border-radius:4px;overflow:hidden;margin-top:10px;">
       <div style="height:100%;width:${todayPct}%;background:${todayBarColor};border-radius:4px;transition:width .4s ease;"></div>
     </div>
+    ${todayLecTotal > 0 ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid ${isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.08)'};font-size:11px;color:#888;">
+      Total lectures completed: <span style="color:#7EC8A8;font-weight:800;">${todayLecTotal}</span> <span style="color:#666;">(as of today)</span>
+    </div>` : ''}
   </div>`;
 
   if(allDays.length === 0) return todayCard;
@@ -643,6 +705,7 @@ function renderDailyTracker() {
       const label = dateObj.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
       const todayLocal = new Date();
       const isToday = d === `${todayLocal.getFullYear()}-${String(todayLocal.getMonth()+1).padStart(2,'0')}-${String(todayLocal.getDate()).padStart(2,'0')}`;
+      const dayLecTotal = lecSortedDates.includes(d) ? lecturesCompletedAsOf(d, lecCumulative, lecSortedDates) : 0;
       return `<div style="background:${mins===0?(isHeatmap?'rgba(0,0,0,.02)':'rgba(255,255,255,.02)'):(isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.04)')};border:1px solid ${mins===0?(isHeatmap?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'):(isHeatmap?'rgba(0,0,0,.07)':'rgba(255,255,255,.07)')};border-radius:14px;padding:14px 16px;margin-bottom:8px;${isToday?'border-color:rgba(126,200,168,.35);':''}" >
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${mins>0?'10px':'0'};">
           <div style="font-size:13px;font-weight:700;color:${mins===0?'#555':'#ccc'}">${label}${isToday?' <span style="font-size:9px;background:rgba(126,200,168,.15);color:#7EC8A8;padding:1px 6px;border-radius:8px;font-weight:700;">TODAY</span>':''}</div>
@@ -652,6 +715,9 @@ function renderDailyTracker() {
           <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width .4s ease;"></div>
         </div>
         <div style="font-size:10px;color:#555;margin-top:5px;text-align:right">${pct}% of ${HOURS_PER_DAY}h goal</div>` : ''}
+        ${dayLecTotal > 0 ? `<div style="margin-top:${mins>0?'8px':'10px'};${mins>0?'padding-top:8px;border-top:1px solid '+(isHeatmap?'rgba(0,0,0,.06)':'rgba(255,255,255,.06)')+';':''}font-size:10px;color:#888;">
+          Total lectures completed: <span style="color:#7EC8A8;font-weight:800;">${dayLecTotal}</span> <span style="color:#666;">(as of this day)</span>
+        </div>` : ''}
       </div>`;
     }).join('');
 
