@@ -105,7 +105,7 @@
   .lec-row:last-child{border-bottom:none;}
   .lec-check{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s;}
   .lec-name{flex:1;font-size:12px;}
-  .lec-dur{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;}
+  .lec-dur{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;cursor:pointer;}
   .btn-row{display:flex;justify-content:space-between;margin-bottom:10px;}
   .btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;border:none;}
   #countdown-wrap{font-variant-numeric:tabular-nums;}
@@ -449,6 +449,41 @@ function fmtMins(m) {
   if(h===0) return mm+'m';
   if(mm===0) return h+'h';
   return h+'h '+mm+'m';
+}
+function copyLecInfo(lecNum, chapterName, durStr) {
+  const text = `L${lecNum} - ${chapterName} ${durStr}`;
+  function showToast() {
+    let t = document.getElementById('copy-toast');
+    if(!t) {
+      t = document.createElement('div');
+      t.id = 'copy-toast';
+      t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A1D28;color:#E8EAF0;border:1px solid rgba(255,255,255,.12);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.3);transition:opacity .25s;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.textContent = '📋 ' + text;
+    t.style.opacity = '1';
+    clearTimeout(t._hideTimer);
+    t._hideTimer = setTimeout(()=>{ t.style.opacity = '0'; }, 1400);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showToast).catch(()=>{
+      fallbackCopy(text);
+      showToast();
+    });
+  } else {
+    fallbackCopy(text);
+    showToast();
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch{}
+  document.body.removeChild(ta);
 }
 function chStats(ch) {
   const total = ch.lectures.reduce((s,l)=>s+l.mins,0);
@@ -988,7 +1023,7 @@ function renderSubject(sub) {
               <div class="lec-name" style="color:${isDone?'#888':'#ddd'};text-decoration:${isDone?'line-through':'none'}">Lecture ${li+1}</div>
               ${dateBadge}
             </div>
-            <div class="lec-dur" style="background:${durBg};color:${durColor}">${fmtMins(lec.mins)}</div>
+            <div class="lec-dur" onclick="(function(e){e.stopPropagation();copyLecInfo('${li+1}','${ch.name.replace(/'/g,"\\'")}','${fmtMins(lec.mins)}');})(event)" style="background:${durBg};color:${durColor}">${fmtMins(lec.mins)}</div>
           </div>`;
         }).join('')}
       </div>
