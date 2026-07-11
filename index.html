@@ -80,10 +80,11 @@
   body.heatmap #theme-toggle { background: rgba(0,0,0,.07) !important; border-color: rgba(0,0,0,.12) !important; color: #555 !important; }
   body.heatmap #settings-btn { background: rgba(0,0,0,.07) !important; border-color: rgba(0,0,0,.12) !important; }
   body.heatmap #settings-inner { background: #ffffff !important; border-color: rgba(0,0,0,.08) !important; }
-  body.heatmap #settings-card-1, body.heatmap #settings-card-2, body.heatmap #settings-card-3 { background: rgba(0,0,0,.04) !important; border-color: rgba(0,0,0,.07) !important; }
+  body.heatmap #settings-card-1, body.heatmap #settings-card-2, body.heatmap #settings-card-3, body.heatmap #settings-card-copy { background: rgba(0,0,0,.04) !important; border-color: rgba(0,0,0,.07) !important; }
   body.heatmap #export-btn { color: #fff !important; }
   body.heatmap #import-label { background: rgba(62,140,168,.1) !important; border-color: rgba(62,140,168,.3) !important; color: #3A8BA8 !important; }
-  body.heatmap #settings-modal button:not(#settings-btn):not(#export-btn) { background: rgba(196,119,65,.1) !important; border-color: rgba(196,119,65,.3) !important; color: #C47741 !important; }
+  body.heatmap #settings-modal button:not(#settings-btn):not(#export-btn):not(.copy-behavior-active) { background: rgba(196,119,65,.1) !important; border-color: rgba(196,119,65,.3) !important; color: #C47741 !important; }
+  body.heatmap .copy-behavior-active { background: #C47741 !important; border-color: #C47741 !important; color: #fff !important; }
   body.heatmap .diff-dots { display: none !important; }
 
   .chapter-card.starred{border-color:rgba(245,200,66,.3);background:rgba(255,210,50,.03);}
@@ -250,38 +251,40 @@ const SUBJECTS = [
         {id:"cost_c8_l2",mins:D(.0044907407407407405),done:false}]},
       { id:"cost_c9", name:"9. Job Costing", lectures:[
         {id:"cost_c9_l1",mins:D(.049699074074074076),done:false}]},
-      { id:"cost_c10", name:"10. Process Costing", lectures:[
-        {id:"cost_c10_l1",mins:D(.11363425925925925),done:false},
-        {id:"cost_c10_l2",mins:D(.10945601851851852),done:false},
-        {id:"cost_c10_l3",mins:D(.12788194444444445),done:false},
-        {id:"cost_c10_l4",mins:D(.09883101851851851),done:false}]},
-      { id:"cost_c11", name:"11. Joint & By-Product", lectures:[
-        {id:"cost_c11_l1",mins:D(.10385416666666666),done:false},
-        {id:"cost_c11_l2",mins:D(.07108796296296296),done:false}]},
+      { id:"cost_c10", name:"10. Process Costing **", lectures:[
+        {id:"cost_c10_l1",mins:112.5,done:false},
+        {id:"cost_c10_l2",mins:122.1833,done:false},
+        {id:"cost_c10_l3",mins:84.0833,done:false},
+        {id:"cost_c10_l4",mins:121.95,done:false},
+        {id:"cost_c10_l5",mins:120.0,done:false}]},
+      { id:"cost_c11", name:"11. Joint & By-Product **", lectures:[
+        {id:"cost_c11_l1",mins:102.3667,done:false},
+        {id:"cost_c11_l2",mins:87.75,done:false},
+        {id:"cost_c11_l3",mins:140.7667,done:false}]},
       { id:"cost_c12", name:"12. Standard Costing", lectures:[
         {id:"cost_c12_l1",mins:D(.1228125),done:false},
         {id:"cost_c12_l2",mins:D(.05804398148148148),done:false},
         {id:"cost_c12_l3",mins:D(.06024305555555556),done:false},
         {id:"cost_c12_l4",mins:D(.06598379629629629),done:false},
         {id:"cost_c12_l5",mins:D(.08112268518518519),done:false}]},
-      { id:"cost_c13", name:"13. Service Costing", lectures:[
-        {id:"cost_c13_l1",mins:D(.08329861111111111),done:false},
-        {id:"cost_c13_l2",mins:D(.11219907407407408),done:false},
-        {id:"cost_c13_l3",mins:D(.08824074074074074),done:false},
-        {id:"cost_c13_l4",mins:D(.08453703703703704),done:false}]},
-      { id:"cost_c14", name:"14. Marginal Costing", lectures:[
-        {id:"cost_c14_l1",mins:D(.04238425925925926),done:false},
-        {id:"cost_c14_l2",mins:D(.053773148148148146),done:false},
-        {id:"cost_c14_l3",mins:D(.0855787037037037),done:false},
-        {id:"cost_c14_l4",mins:D(.05178240740740741),done:false},
-        {id:"cost_c14_l5",mins:D(.09115740740740741),done:false},
-        {id:"cost_c14_l6",mins:D(.08386574074074074),done:false},
-        {id:"cost_c14_l7",mins:D(.06965277777777777),done:false},
-        {id:"cost_c14_l8",mins:D(.08402777777777778),done:false}]},
+      { id:"cost_c13", name:"13. Service Costing **", lectures:[
+        {id:"cost_c13_l1",mins:102.5167,done:false},
+        {id:"cost_c13_l2",mins:98.3833,done:false},
+        {id:"cost_c13_l3",mins:122.6833,done:false},
+        {id:"cost_c13_l4",mins:96.4667,done:false},
+        {id:"cost_c13_l5",mins:111.8333,done:false}]},
+      { id:"cost_c14", name:"14. Marginal Costing **", lectures:[
+        {id:"cost_c14_l1",mins:79.6833,done:false},
+        {id:"cost_c14_l2",mins:92.9667,done:false},
+        {id:"cost_c14_l3",mins:115.6333,done:false},
+        {id:"cost_c14_l4",mins:81.0833,done:false},
+        {id:"cost_c14_l5",mins:123.1333,done:false},
+        {id:"cost_c14_l6",mins:132.0,done:false},
+        {id:"cost_c14_l7",mins:135.5,done:false}]},
       { id:"cost_c15", name:"15. Budget & Budgetary Control", lectures:[
-        {id:"cost_c15_l1",mins:D(.11217592592592593),done:false},
-        {id:"cost_c15_l2",mins:D(.08674768518518519),done:false},
-        {id:"cost_c15_l3",mins:D(.07884259259259259),done:false}]}
+        {id:"cost_c15_l1",mins:D(.06940972222222221988),done:false},
+        {id:"cost_c15_l2",mins:D(.11541666666666665353),done:false},
+        {id:"cost_c15_l3",mins:D(.00665509259259259266),done:false}]}
     ]},
   { id:"audit", name:"Auditing & Ethics", short:"Audit", color:"#E8A87C", accent:"#C47741",
     chapters:[
@@ -379,23 +382,23 @@ const SUBJECTS = [
         {id:"fm_c7_l2",mins:D(.07490740740740741),done:false},
         {id:"fm_c7_l3",mins:D(.04486111111111111),done:false}]},
       { id:"fm_c8", name:"8. Receivables and Payables", lectures:[
-        {id:"fm_c8_l1",mins:D(.12354166666666666),done:false},
-        {id:"fm_c8_l2",mins:D(.05855324074074074),done:false},
-        {id:"fm_c8_l3",mins:D(.07952546296296296),done:false},
-        {id:"fm_c8_l4",mins:D(.0042361111111111115),done:false}]},
+        {id:"fm_c8_l1",mins:D(.07680555555555555747),done:false},
+        {id:"fm_c8_l2",mins:D(.11177083333333331927),done:false},
+        {id:"fm_c8_l3",mins:D(.00423611111111111063),done:false}]},
       { id:"fm_c9", name:"9. Treasury and Cash Management", lectures:[
-        {id:"fm_c9_l1",mins:D(.06644675925925926),done:false},
-        {id:"fm_c9_l2",mins:D(.06849537037037037),done:false},
-        {id:"fm_c9_l3",mins:D(.08010416666666667),done:false},
-        {id:"fm_c9_l4",mins:D(.00318287037037037),done:false},
-        {id:"fm_c9_l5",mins:D(.022152777777777778),done:false}]},
+        {id:"fm_c9_l1",mins:D(.06224537037037037451),done:false},
+        {id:"fm_c9_l2",mins:D(.05526620370370369933),done:false},
+        {id:"fm_c9_l3",mins:D(.06096064814814814575),done:false},
+        {id:"fm_c9_l4",mins:D(.00318287037037037019),done:false}]},
       { id:"fm_c10", name:"10. Sources of Finance", lectures:[
         {id:"fm_c10_l1",mins:D(.07679398148148148),done:false}]},
       { id:"fm_c11", name:"11. Financial Analysis – Ratio Analysis", lectures:[
-        {id:"fm_c11_l1",mins:D(.07763888888888888),done:false},
-        {id:"fm_c11_l2",mins:D(.08457175925925926),done:false},
-        {id:"fm_c11_l3",mins:D(.11065972222222223),done:false},
-        {id:"fm_c11_l4",mins:D(.00883101851851852),done:false}]}
+        {id:"fm_c11_l1",mins:D(.07039351851851850805),done:false},
+        {id:"fm_c11_l2",mins:D(.07861111111111111771),done:false},
+        {id:"fm_c11_l3",mins:D(.14864583333333333814),done:false},
+        {id:"fm_c11_l4",mins:D(.00883101851851851929),done:false}]},
+      { id:"fm_c12", name:"12. Inventory Management", lectures:[
+        {id:"fm_c12_l1",mins:D(.02528935185185185106),done:false}]}
     ]},
   { id:"sm", name:"Strategic Management", short:"SM", color:"#A07EC8", accent:"#6B4FA8",
     chapters:[
@@ -425,22 +428,32 @@ const SUBJECTS = [
 const STORAGE_KEY = "hours_tracker_html_v1";
 const TIMESTAMPS_KEY = "hours_tracker_timestamps_v1";
 const STARRED_KEY = "hours_tracker_starred_v1";
+const COPY_BEHAVIOR_KEY = "hours_tracker_copy_behavior_v1";
+const SPLITS_KEY = "hours_tracker_splits_v1";
 
 // --- State ---
 let watched = {};
-let timestamps = {}; // lecId -> ISO date string when ticked
+let timestamps = {}; // lecId -> ISO date string when ticked (= final/last day studied)
 let starred = {};    // chapterId -> true
+let copyBehavior = 'full'; // 'full' | 'durationOnly'
+// splits[lecId] = [{date:'YYYY-MM-DD', mins:Number}, ...]  (minutes for that lecture split across multiple days; sums to lec.mins)
+// Only present when a lecture was studied across >1 day. Absent = all mins credited to timestamps[lecId]'s date, as before.
+let splits = {};
 
 function initState() {
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(l => { watched[l.id] = l.done; })));
   try { const s = localStorage.getItem(STORAGE_KEY); if(s) watched = JSON.parse(s); } catch{}
   try { const t = localStorage.getItem(TIMESTAMPS_KEY); if(t) timestamps = JSON.parse(t); } catch{}
   try { const r = localStorage.getItem(STARRED_KEY); if(r) starred = JSON.parse(r); } catch{}
+  try { const c = localStorage.getItem(COPY_BEHAVIOR_KEY); if(c==='full' || c==='durationOnly') copyBehavior = c; } catch{}
+  try { const sp = localStorage.getItem(SPLITS_KEY); if(sp) splits = JSON.parse(sp); } catch{}
 }
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(watched)); } catch{}
   try { localStorage.setItem(TIMESTAMPS_KEY, JSON.stringify(timestamps)); } catch{}
   try { localStorage.setItem(STARRED_KEY, JSON.stringify(starred)); } catch{}
+  try { localStorage.setItem(COPY_BEHAVIOR_KEY, copyBehavior); } catch{}
+  try { localStorage.setItem(SPLITS_KEY, JSON.stringify(splits)); } catch{}
 }
 
 // --- Utils ---
@@ -450,8 +463,12 @@ function fmtMins(m) {
   if(mm===0) return h+'h';
   return h+'h '+mm+'m';
 }
-function copyLecInfo(lecNum, chapterName, durStr) {
-  const text = `L${lecNum} - ${chapterName} ${durStr}`;
+function fmtDurCopy(m) {
+  const h = Math.floor(m/60), mm = Math.round(m%60);
+  return String(h).padStart(2,'0')+'h '+String(mm).padStart(2,'0')+'m';
+}
+function copyLecInfo(lecNum, chapterName, durStr, mins) {
+  const text = copyBehavior === 'durationOnly' ? fmtDurCopy(mins) : `L${lecNum} - ${chapterName} ${durStr}`;
   function showToast() {
     let t = document.getElementById('copy-toast');
     if(!t) {
@@ -548,8 +565,12 @@ function getDailyLog() {
   const log = {};
   SUBJECTS.forEach(s => s.chapters.forEach(ch => ch.lectures.forEach(lec => {
     if(watched[lec.id] && timestamps[lec.id]) {
-      const d = timestamps[lec.id].slice(0,10);
-      log[d] = (log[d] || 0) + lec.mins;
+      if(splits[lec.id] && splits[lec.id].length) {
+        splits[lec.id].forEach(part => { log[part.date] = (log[part.date] || 0) + part.mins; });
+      } else {
+        const d = timestamps[lec.id].slice(0,10);
+        log[d] = (log[d] || 0) + lec.mins;
+      }
     }
   })));
   return log;
@@ -1013,8 +1034,10 @@ function renderSubject(sub) {
           if(isDone && timestamps[lec.id]) {
             const d = new Date(timestamps[lec.id]);
             const dateStr = d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+            const isSplit = splits[lec.id] && splits[lec.id].length > 1;
+            const splitTag = isSplit ? `<span style="font-size:8px;opacity:.6"> · ${splits[lec.id].length}d</span>` : '';
             dateBadge = `<div class="lec-date" onclick="(function(e){e.stopPropagation();editLecDate('${lec.id}',event);})(event)" style="cursor:pointer;display:inline-flex;align-items:center;gap:3px;border-bottom:1px dashed rgba(255,255,255,.15);padding-bottom:1px;" title="Tap to edit date">
-              ${dateStr} <span style="font-size:8px;opacity:.5">✏️</span>
+              ${dateStr}${splitTag} <span style="font-size:8px;opacity:.5">✏️</span>
             </div>`;
           }
           return `<div class="lec-row" onclick="toggleLec('${sub.id}','${ch.id}','${lec.id}')">
@@ -1023,7 +1046,7 @@ function renderSubject(sub) {
               <div class="lec-name" style="color:${isDone?'#888':'#ddd'};text-decoration:${isDone?'line-through':'none'}">Lecture ${li+1}</div>
               ${dateBadge}
             </div>
-            <div class="lec-dur" onclick="(function(e){e.stopPropagation();copyLecInfo('${li+1}','${ch.name.replace(/'/g,"\\'")}','${fmtMins(lec.mins)}');})(event)" style="background:${durBg};color:${durColor}">${fmtMins(lec.mins)}</div>
+            <div class="lec-dur" onclick="(function(e){e.stopPropagation();copyLecInfo('${li+1}','${ch.name.replace(/'/g,"\\'")}','${fmtMins(lec.mins)}',${lec.mins});})(event)" style="background:${durBg};color:${durColor}">${fmtMins(lec.mins)}</div>
           </div>`;
         }).join('')}
       </div>
@@ -1126,8 +1149,10 @@ window.toggleLec = function(subId, chId, lecId) {
   if(nowTicking) {
     const n = new Date();
     timestamps[lecId] = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}T${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+    delete splits[lecId];
   } else {
     delete timestamps[lecId];
+    delete splits[lecId];
   }
   save();
   const sub = SUBJECTS.find(s=>s.id===subId);
@@ -1144,55 +1169,192 @@ window.toggleLec = function(subId, chId, lecId) {
   renderHeader();
 };
 
+// In-memory working state for the split-date editor, keyed off nothing global —
+// just a local array of {date, mins} rows rebuilt each time the modal opens.
+let _dateEditRows = [];
+let _dateEditLecId = null;
+let _dateEditTotalMins = 0;
+
+function _findLecById(lecId) {
+  for(const s of SUBJECTS) for(const ch of s.chapters) for(const lec of ch.lectures) if(lec.id === lecId) return lec;
+  return null;
+}
+
 window.editLecDate = function(lecId, e) {
   e.stopPropagation();
+  const lec = _findLecById(lecId);
+  if(!lec) return;
+
   const _ed = new Date();
   const _edToday = `${_ed.getFullYear()}-${String(_ed.getMonth()+1).padStart(2,'0')}-${String(_ed.getDate()).padStart(2,'0')}`;
   const current = timestamps[lecId] ? timestamps[lecId].slice(0,10) : _edToday;
+
+  _dateEditLecId = lecId;
+  _dateEditTotalMins = lec.mins;
+  // Seed rows: existing split if present, else a single row with the full duration on the current date.
+  if(splits[lecId] && splits[lecId].length) {
+    _dateEditRows = splits[lecId].map(p => ({date: p.date, mins: p.mins}));
+  } else {
+    _dateEditRows = [{date: current, mins: lec.mins}];
+  }
 
   const existing = document.getElementById('date-edit-overlay');
   if(existing) existing.remove();
 
   const overlay = document.createElement('div');
   overlay.id = 'date-edit-overlay';
+  overlay.dataset.maxDate = _edToday;
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);';
-
-  const isHeatmap = document.body.classList.contains('heatmap');
-  overlay.innerHTML = `
-    <div style="background:${isHeatmap?'#ffffff':'#1A1D28'};border-radius:22px 22px 0 0;border:1px solid ${isHeatmap?'rgba(0,0,0,.08)':'rgba(255,255,255,.08)'};width:100%;max-width:480px;padding:24px 24px 40px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-size:15px;font-weight:800;color:${isHeatmap?'#1E1B16':'#E8EAF0'};">📅 Edit Study Date</div>
-        <button onclick="document.getElementById('date-edit-overlay').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:28px;height:28px;font-size:14px;color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-      </div>
-      <div style="font-size:11px;color:#888;margin-bottom:14px;line-height:1.5;">Change the date this lecture was actually studied. The daily log will update automatically.</div>
-      <input type="date" id="date-edit-input" value="${current}" max="${_edToday}"
-        style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid ${isHeatmap?'rgba(0,0,0,.15)':'rgba(255,255,255,.15)'};background:${isHeatmap?'rgba(0,0,0,.04)':'rgba(255,255,255,.06)'};color:${isHeatmap?'#1E1B16':'#E8EAF0'};font-size:15px;font-family:inherit;box-sizing:border-box;margin-bottom:14px;outline:none;">
-      <button onclick="(function(){
-        const val = document.getElementById('date-edit-input').value;
-        if(!val) return;
-        const existing = timestamps['${lecId}'];
-        const time = existing ? existing.slice(11) : 'T12:00:00.000Z'.slice(1);
-        timestamps['${lecId}'] = val + 'T' + time;
-        save();
-        render();
-        document.getElementById('date-edit-overlay').remove();
-      })()" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#7EC8A8,#5aaa88);color:#0F1117;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">
-        ✓ Save Date
-      </button>
-      <button onclick="(function(){
-        delete timestamps['${lecId}'];
-        save();
-        render();
-        document.getElementById('date-edit-overlay').remove();
-      })()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(232,124,124,.4);background:rgba(232,124,124,.1);color:#E87C7C;font-size:14px;font-weight:700;cursor:pointer;">
-        🗑 Remove Date (exclude from tracker)
-      </button>
-    </div>`;
+  document.body.appendChild(overlay);
 
   overlay.addEventListener('click', function(ev) {
     if(ev.target === overlay) overlay.remove();
   });
-  document.body.appendChild(overlay);
+
+  _renderDateEditModal();
+};
+
+function _dateEditSumMins() {
+  return _dateEditRows.reduce((a,r) => a + r.mins, 0);
+}
+
+function _renderDateEditModal() {
+  const overlay = document.getElementById('date-edit-overlay');
+  if(!overlay) return;
+  const isHeatmap = document.body.classList.contains('heatmap');
+  const fg = isHeatmap ? '#1E1B16' : '#E8EAF0';
+  const sub = isHeatmap ? '#666' : '#888';
+  const border = isHeatmap ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.15)';
+  const inputBg = isHeatmap ? 'rgba(0,0,0,.04)' : 'rgba(255,255,255,.06)';
+  const maxDate = overlay.dataset.maxDate;
+  const total = _dateEditTotalMins;
+  const sum = _dateEditSumMins();
+  const remaining = total - sum;
+  const balanced = remaining === 0;
+  const multiDay = _dateEditRows.length > 1;
+
+  const rowsHtml = _dateEditRows.map((row, i) => {
+    return `
+    <div style="background:${inputBg};border:1px solid ${border};border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:${multiDay?'10px':'0'};">
+        <input type="date" value="${row.date}" max="${maxDate}"
+          oninput="_dateEditRows[${i}].date=this.value"
+          style="flex:1;padding:9px 10px;border-radius:9px;border:1px solid ${border};background:transparent;color:${fg};font-size:13px;font-family:inherit;outline:none;">
+        ${_dateEditRows.length > 1 ? `<button onclick="_dateEditRemoveRow(${i})" style="background:rgba(232,124,124,.12);border:1px solid rgba(232,124,124,.3);color:#E87C7C;border-radius:8px;width:32px;height:32px;font-size:14px;flex-shrink:0;">✕</button>` : ''}
+      </div>
+      ${multiDay ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-size:10px;color:${sub};text-transform:uppercase;letter-spacing:.5px;">Time on this day</span>
+        <span style="font-size:12px;font-weight:800;color:${fg};" id="date-edit-rowval-${i}">${fmtMins(row.mins)}</span>
+      </div>
+      <input type="range" min="0" max="${total}" step="1" value="${row.mins}"
+        oninput="_dateEditSlide(${i}, this.value)"
+        style="width:100%;accent-color:#7EC8A8;">
+      ` : ''}
+    </div>`;
+  }).join('');
+
+  overlay.innerHTML = `
+    <div style="background:${isHeatmap?'#ffffff':'#1A1D28'};border-radius:22px 22px 0 0;border:1px solid ${border};width:100%;max-width:480px;padding:24px 24px 40px;max-height:88vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:800;color:${fg};">📅 Edit Study Date${multiDay?'s':''}</div>
+        <button onclick="document.getElementById('date-edit-overlay').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:28px;height:28px;font-size:14px;color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div style="font-size:11px;color:${sub};margin-bottom:14px;line-height:1.5;">
+        ${multiDay
+          ? `Split this lecture's ${fmtMins(total)} across the days you actually studied it. Drag each slider to divide the time — it must add up to the total.`
+          : `Change the date this lecture was studied, or split it across multiple days if it took more than one session.`}
+      </div>
+
+      ${rowsHtml}
+
+      ${_dateEditRows.length < 2 ? `
+      <button onclick="_dateEditAddRow()" style="width:100%;padding:10px;border-radius:12px;border:1px dashed ${border};background:transparent;color:${sub};font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px;">
+        + Add another date
+      </button>` : ''}
+
+      ${multiDay ? `
+      <div style="font-size:11px;text-align:center;margin-bottom:12px;color:${balanced?'#7EC8A8':'#E87C7C'};font-weight:700;">
+        ${balanced ? `✓ Fully allocated — ${fmtMins(total)} total` : `${fmtMins(Math.abs(remaining))} ${remaining>0?'left to allocate':'over — reduce a slider'}`}
+      </div>` : ''}
+
+      <button id="date-edit-save-btn" ${multiDay && !balanced ? 'disabled' : ''} onclick="_dateEditSave()" style="width:100%;padding:12px;border-radius:12px;border:none;background:${(multiDay && !balanced)?'rgba(126,200,168,.3)':'linear-gradient(135deg,#7EC8A8,#5aaa88)'};color:#0F1117;font-size:14px;font-weight:700;cursor:${(multiDay && !balanced)?'not-allowed':'pointer'};margin-bottom:10px;">
+        ✓ Save ${multiDay ? 'Split' : 'Date'}
+      </button>
+      <button onclick="_dateEditRemoveAll()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(232,124,124,.4);background:rgba(232,124,124,.1);color:#E87C7C;font-size:14px;font-weight:700;cursor:pointer;">
+        🗑 Remove Date (exclude from tracker)
+      </button>
+    </div>`;
+}
+
+window._dateEditSlide = function(i, val) {
+  val = parseInt(val, 10);
+  const rows = _dateEditRows;
+  const total = _dateEditTotalMins;
+  val = Math.max(0, Math.min(val, total));
+  const other = i === 0 ? 1 : 0;
+  rows[i].mins = val;
+  if(rows[other]) rows[other].mins = total - val;
+  _renderDateEditModal();
+};
+
+window._dateEditAddRow = function() {
+  if(_dateEditRows.length >= 2) return; // max 2 days per lecture
+  const maxDate = document.getElementById('date-edit-overlay').dataset.maxDate;
+  const total = _dateEditTotalMins;
+  // First row keeps 100%, new row starts at 0% — user drags to reallocate.
+  _dateEditRows[0].mins = total;
+  // Default date for the new row: day after the first row's date, capped at today.
+  let nextDate = _dateEditRows[0].date;
+  try {
+    const nd = new Date(_dateEditRows[0].date + 'T00:00:00');
+    nd.setDate(nd.getDate() + 1);
+    const cand = `${nd.getFullYear()}-${String(nd.getMonth()+1).padStart(2,'0')}-${String(nd.getDate()).padStart(2,'0')}`;
+    nextDate = cand <= maxDate ? cand : maxDate;
+  } catch{}
+  _dateEditRows.push({date: nextDate, mins: 0});
+  _renderDateEditModal();
+};
+
+window._dateEditRemoveRow = function(i) {
+  if(_dateEditRows.length <= 1) return;
+  _dateEditRows.splice(i, 1);
+  _dateEditRows[0].mins = _dateEditTotalMins; // remaining row takes 100%
+  _renderDateEditModal();
+};
+
+window._dateEditSave = function() {
+  const lecId = _dateEditLecId;
+  const rows = _dateEditRows.filter(r => r.date);
+  if(!rows.length) return;
+  if(_dateEditSumMins() !== _dateEditTotalMins) return; // guard, button should already be disabled
+
+  rows.sort((a,b) => a.date.localeCompare(b.date));
+  const lastDate = rows[rows.length - 1].date;
+  const existingTs = timestamps[lecId];
+  const time = existingTs ? existingTs.slice(11) : 'T12:00:00.000Z'.slice(1);
+  timestamps[lecId] = lastDate + 'T' + time;
+
+  if(rows.length > 1) {
+    splits[lecId] = rows;
+  } else {
+    delete splits[lecId];
+  }
+
+  save();
+  render();
+  const overlay = document.getElementById('date-edit-overlay');
+  if(overlay) overlay.remove();
+};
+
+window._dateEditRemoveAll = function() {
+  const lecId = _dateEditLecId;
+  delete timestamps[lecId];
+  delete splits[lecId];
+  save();
+  render();
+  const overlay = document.getElementById('date-edit-overlay');
+  if(overlay) overlay.remove();
 };
 
 window.toggleStar = function(subId, chId, e) {
@@ -1219,6 +1381,7 @@ window.markAll = function(subId, chId, val) {
     } else {
       watched[l.id] = false;
       delete timestamps[l.id];
+      delete splits[l.id];
     }
   });
   save();
@@ -1274,10 +1437,27 @@ window.openSettings = function() {
   modal.style.overflowY = 'auto';
   document.getElementById('import-msg').style.display = 'none';
   BackupFolderEngine.renderBackupSection();
+  renderCopyBehaviorUI();
 };
 window.closeSettings = function() {
   document.getElementById('settings-overlay').style.display = 'none';
   document.getElementById('settings-modal').style.display = 'none';
+};
+function renderCopyBehaviorUI() {
+  ['full','durationOnly'].forEach(opt => {
+    const btn = document.getElementById('copy-behavior-'+opt);
+    if(!btn) return;
+    const active = copyBehavior === opt;
+    btn.classList.toggle('copy-behavior-active', active);
+    btn.style.background = active ? '#C47741' : 'rgba(255,255,255,.06)';
+    btn.style.color = active ? '#fff' : '#aaa';
+    btn.style.border = active ? '1px solid #C47741' : '1px solid rgba(255,255,255,.1)';
+  });
+}
+window.setCopyBehavior = function(opt) {
+  copyBehavior = opt;
+  save();
+  renderCopyBehaviorUI();
 };
 
 window.exportData = function() {
@@ -1656,6 +1836,19 @@ BackupFolderEngine.init().then(() => BackupFolderEngine.renderBackupSection());
           <input type="file" accept=".json" onchange="importData(event)" style="display:none;">
         </label>
         <div id="import-msg" style="font-size:11px;margin-top:8px;text-align:center;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Preferences Section -->
+    <div style="padding:0 20px 16px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#666;text-transform:uppercase;margin-bottom:10px;">Preferences</div>
+      <div id="settings-card-copy" style="border-radius:14px;padding:14px 16px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📋 Copy Behaviour</div>
+        <div style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.5">Choose what gets copied when you tap a lecture's duration.</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="setCopyBehavior('full')" id="copy-behavior-full" style="flex:1;padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Entire Thing</button>
+          <button onclick="setCopyBehavior('durationOnly')" id="copy-behavior-durationOnly" style="flex:1;padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Duration Only</button>
+        </div>
       </div>
     </div>
 
