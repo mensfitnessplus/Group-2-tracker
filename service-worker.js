@@ -1,5 +1,5 @@
 // Fixed typo: Must be lowercase "const"
-const CACHE_NAME = "ca-tracker-v1.8"; 
+const CACHE_NAME = "ca-tracker-v1.9"; 
 
 const urlsToCache = [
   "./",
